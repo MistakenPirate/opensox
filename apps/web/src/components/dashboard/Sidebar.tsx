@@ -5,6 +5,7 @@ import Link from "next/link";
 import SidebarItem from "../sidebar/SidebarItem";
 import { useRouter } from "next/navigation";
 import { IconWrapper } from "../ui/IconWrapper";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   XMarkIcon,
   HomeIcon,
@@ -41,9 +42,8 @@ const SIDEBAR_ROUTES = [
   },
 ];
 
-export default function Sidebar() {
-  const { showSidebar, setShowSidebar, isCollapsed, toggleCollapsed } =
-    useShowSidebar();
+export default function Sidebar({ overlay = false }: { overlay?: boolean }) {
+  const { setShowSidebar, isCollapsed, toggleCollapsed } = useShowSidebar();
   const router = useRouter();
   const { isPaidUser } = useSubscription();
 
@@ -58,14 +58,19 @@ export default function Sidebar() {
       router.push("/pricing");
     }
   };
+  const desktopWidth = isCollapsed ? 80 : 288;
+  const mobileWidth = desktopWidth;
 
   return (
-    <div
-      className={`h-screen ${
-        isCollapsed ? "w-20" : "w-72"
-      } flex flex-col bg-ox-sidebar border-r border-ox-header z-50 transition-all duration-300 ease-out ${
-        showSidebar ? "fixed xl:relative left-0 top-0 bottom-0" : ""
+    <motion.div
+      className={`h-screen flex flex-col bg-ox-sidebar border-r border-ox-header z-50 ${
+        overlay ? "fixed left-0 top-0 bottom-0 xl:hidden" : ""
       }`}
+      initial={overlay ? { x: -400, width: mobileWidth } : { width: desktopWidth }}
+      animate={overlay ? { x: 0, width: mobileWidth } : { width: desktopWidth }}
+      exit={overlay ? { x: -400, width: mobileWidth } : undefined}
+      transition={{ type: "spring", stiffness: 260, damping: 30 }}
+      style={{ width: overlay ? mobileWidth : desktopWidth }}
     >
       {/* Mobile header */}
       <div className="flex justify-between items-center h-16 px-4 border-b border-ox-header xl:hidden bg-ox-sideba">
@@ -149,7 +154,7 @@ export default function Sidebar() {
 
       {/* Bottom profile */}
       <ProfileMenu isCollapsed={isCollapsed} />
-    </div>
+    </motion.div>
   );
 }
 
@@ -203,46 +208,55 @@ function ProfileMenu({ isCollapsed }: { isCollapsed: boolean }) {
         )}
       </div>
       {/* Profile Card Dropdown */}
-      {!isCollapsed && open && (
-        <div className="absolute bottom-full left-3 right-3 mb-2 bg-ox-profile-card border border-ox-header rounded-lg shadow-xl overflow-hidden z-50">
-          {/* User Info Section */}
-          <div className="p-3 border-b border-ox-header">
-            <div className="flex items-center gap-3">
-              <ProfilePic imageUrl={userImage} />
-              <div className="flex flex-col">
-                <span className="text-sm text-white font-semibold">
-                  {fullName}
-                </span>
-                <span className="text-xs text-zinc-400">{userEmail}</span>
+      <AnimatePresence>
+        {!isCollapsed && open && (
+          <motion.div 
+            key="profile-dropdown"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.18 }}
+            className="absolute bottom-full left-3 right-3 mb-2 bg-ox-profile-card border border-ox-header rounded-lg shadow-xl overflow-hidden z-50"
+          >
+            {/* User Info Section */}
+            <div className="p-3 border-b border-ox-header">
+              <div className="flex items-center gap-3">
+                <ProfilePic imageUrl={userImage} />
+                <div className="flex flex-col">
+                  <span className="text-sm text-white font-semibold">
+                    {fullName}
+                  </span>
+                  <span className="text-xs text-zinc-400">{userEmail}</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Menu Items */}
-          <div className="py-1">
-            <button
-              onClick={() => {
-                router.push("/dashboard/account");
-                setOpen(false);
-              }}
-              className="w-full flex items-center gap-3 px-3 py-2 text-sm text-[#eaeaea] hover:bg-ox-sidebar transition-colors"
-            >
-              <Cog6ToothIcon className="size-4" />
-              <span>Account Settings</span>
-            </button>
-            <button
-              onClick={() => {
-                signOut({ callbackUrl: "/" });
-                setOpen(false);
-              }}
-              className="w-full flex items-center gap-3 px-3 py-2 text-sm text-[#eaeaea] hover:bg-ox-sidebar transition-colors"
-            >
-              <ArrowRightOnRectangleIcon className="size-4" />
-              <span>Logout</span>
-            </button>
-          </div>
-        </div>
-      )}
+            {/* Menu Items */}
+            <div className="py-1">
+              <button
+                onClick={() => {
+                  router.push("/dashboard/account");
+                  setOpen(false);
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-[#eaeaea] hover:bg-ox-sidebar transition-colors"
+              >
+                <Cog6ToothIcon className="size-4" />
+                <span>Account Settings</span>
+              </button>
+              <button
+                onClick={() => {
+                  signOut({ callbackUrl: "/" });
+                  setOpen(false);
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-[#eaeaea] hover:bg-ox-sidebar transition-colors"
+              >
+                <ArrowRightOnRectangleIcon className="size-4" />
+                <span>Logout</span>
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
