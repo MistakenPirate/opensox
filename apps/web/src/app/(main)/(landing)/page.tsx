@@ -10,6 +10,7 @@ import Testimonials from '@/components/landing-sections/testimonials'
 import Video from '@/components/landing-sections/video'
 import React from 'react'
 import { FaqSection } from '@/components/faq/FaqSection'
+import Features from '@/components/landing-sections/features'
 
 
 const Landing = () => {
@@ -24,6 +25,7 @@ const Landing = () => {
                 <FaqSection />
                 <Brands />
                 <Testimonials />
+                <Features />
             </div>
             <div className="max-w-[2000px] w-full mx-auto">
                 <CTA />
