@@ -132,6 +132,7 @@ export default function ExploreFeaturesDashboard() {
     return () => observer.disconnect();
   }, [startAutoAdvance, clearAutoInterval, clearResumeTimeout]);
 
+  // Scroll only within the sidebar nav — never scroll the page
   const scrollSidebarToActive = useCallback((index: number) => {
     const activeEl = sidebarItemRefs.current[index];
     const sidebar = sidebarRef.current;
@@ -218,7 +219,6 @@ export default function ExploreFeaturesDashboard() {
                         }}
                       />
                     )}
-
                     <span
                       className={cn(
                         "relative z-10 shrink-0 transition-colors duration-300",
