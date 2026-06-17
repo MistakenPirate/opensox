@@ -10,7 +10,7 @@ import Testimonials from '@/components/landing-sections/testimonials'
 import Video from '@/components/landing-sections/video'
 import React from 'react'
 import { FaqSection } from '@/components/faq/FaqSection'
-import Features from '@/components/landing-sections/features'
+import Features from '@/components/features/features'
 
 
 const Landing = () => {

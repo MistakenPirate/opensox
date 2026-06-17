@@ -1,21 +1,23 @@
 import {
-  Bell,
-  Calendar,
-  Compass,
-  Lock,
-  MessageSquare,
-  PhoneCall,
-  Share2,
-  ShieldAlert,
-  Sparkles,
-  Trophy,
-  Tv,
-  Users,
-  Video,
-  type LucideIcon,
-} from "lucide-react";
+  BellIcon,
+  CalendarDaysIcon,
+  ChatBubbleLeftRightIcon,
+  LockClosedIcon,
+  MapIcon,
+  PhoneIcon,
+  ShareIcon,
+  ShieldExclamationIcon,
+  SparklesIcon,
+  TrophyIcon,
+  TvIcon,
+  UserGroupIcon,
+  VideoCameraIcon,
+} from "@heroicons/react/24/outline";
+import type { ComponentType, SVGProps } from "react";
 
 export const SHARED_FEATURE_PREVIEW = "/assets/features/pro-preview.svg";
+
+export type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>;
 
 export type FeatureIconName =
   | "PhoneCall"
@@ -40,20 +42,20 @@ export type FeatureData = {
   image: string;
 };
 
-export const FEATURE_ICON_MAP: Record<FeatureIconName, LucideIcon> = {
-  PhoneCall,
-  Compass,
-  Users,
-  Tv,
-  MessageSquare,
-  Trophy,
-  Lock,
-  Sparkles,
-  Video,
-  ShieldAlert,
-  Bell,
-  Calendar,
-  Share2,
+export const FEATURE_ICON_MAP: Record<FeatureIconName, HeroIcon> = {
+  PhoneCall: PhoneIcon,
+  Compass: MapIcon,
+  Users: UserGroupIcon,
+  Tv: TvIcon,
+  MessageSquare: ChatBubbleLeftRightIcon,
+  Trophy: TrophyIcon,
+  Lock: LockClosedIcon,
+  Sparkles: SparklesIcon,
+  Video: VideoCameraIcon,
+  ShieldAlert: ShieldExclamationIcon,
+  Bell: BellIcon,
+  Calendar: CalendarDaysIcon,
+  Share2: ShareIcon,
 };
 
 export const FEATURES_DATA: FeatureData[] = [

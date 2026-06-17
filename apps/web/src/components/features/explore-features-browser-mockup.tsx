@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { HeroIcon } from "./explore-features-data";
 
 type BrowserMockupProps = {
   imageSrc: string;
   featureTitle: string;
-  FeatureIcon: LucideIcon;
+  FeatureIcon: HeroIcon;
   className?: string;
 };
 
@@ -54,7 +54,6 @@ export default function ExploreFeaturesBrowserMockup({
           />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6">
-            {/* CSS fallback: purple-themed dashboard skeleton */}
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(85,25,247,0.15)_0%,transparent_70%)]" />
             <div className="absolute left-4 top-4 h-8 w-24 rounded-md bg-brand-purple/20" />
             <div className="absolute right-4 top-4 flex gap-2">
