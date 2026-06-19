@@ -35,9 +35,6 @@ const Footer = () => {
               <h4 className="text-white text-4xl lg:text-5xl font-medium tracking-tight">
                 Opensox AI
               </h4>
-              <p className="text-[#b1b1b1] text-base lg:text-lg tracking-tight mt-1">
-                Search. Find. Contribute. Win
-              </p>
             </div>
             <div className="flex items-center gap-2">
               <Image
@@ -48,7 +45,7 @@ const Footer = () => {
                 className="rounded-full object-cover object-[center_20%] aspect-square w-8 h-8"
               />
               <span className="text-[#b1b1b1] text-xs font-mono">
-                Cooked by ajeetunc
+                by jackedAJ
               </span>
             </div>
           </div>
@@ -154,11 +151,11 @@ const Footer = () => {
               </h3>
               <div className="flex flex-col gap-2">
                 <Link
-                  href="https://x.com/opensoxai"
+                  href="https://x.com/jackedAJ"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() =>
-                    handleSocialClick("https://x.com/opensoxai", "Twitter")
+                    handleSocialClick("https://x.com/jackedAJ", "Twitter")
                   }
                   className="text-[#b1b1b1] hover:text-white transition-colors text-xs flex items-center gap-1.5"
                 >
@@ -174,7 +171,7 @@ const Footer = () => {
                   onClick={() =>
                     handleSocialClick(
                       "https://github.com/apsinghdev/opensox",
-                      "GitHub"
+                      "GitHub",
                     )
                   }
                   className="text-[#b1b1b1] hover:text-white transition-colors text-xs flex items-center gap-1.5"
@@ -191,7 +188,7 @@ const Footer = () => {
                   onClick={() =>
                     handleSocialClick(
                       "https://www.youtube.com/channel/UC7QV7uSxlbha-bNPaev5MeQ",
-                      "YouTube"
+                      "YouTube",
                     )
                   }
                   className="text-[#b1b1b1] hover:text-white transition-colors text-xs flex items-center gap-1.5"
@@ -208,7 +205,7 @@ const Footer = () => {
                   onClick={() =>
                     handleSocialClick(
                       "https://discord.gg/zbHzgMNBrm",
-                      "Discord"
+                      "Discord",
                     )
                   }
                   className="text-[#b1b1b1] hover:text-white transition-colors text-xs flex items-center gap-1.5"
@@ -235,10 +232,7 @@ const Footer = () => {
         {/* Bottom Row - Copyright */}
         <div className="text-center">
           <p className="font-mono text-xs lg:text-sm text-[#b1b1b1]">
-            © {new Date().getFullYear()} Opensox AI. All rights reserved.
-          </p>
-          <p className="font-mono text-xs lg:text-xs italic text-[#b1b1b1] mt-2">
-            Building 21st century open-source infrastructure
+            © {new Date().getFullYear()} Opensox Labs. All rights reserved.
           </p>
         </div>
       </div>

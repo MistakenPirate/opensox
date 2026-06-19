@@ -1,7 +1,6 @@
 <h1 align="center">Opensox AI </h1>
 
 <p align="center">
-    Building 21st century open-source infrastructure
     <br />
     <a href="https://opensox.ai"><strong>Learn more »</strong></a>
     <br />

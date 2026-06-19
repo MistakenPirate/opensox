@@ -140,7 +140,7 @@ export default function ContactPage() {
               </p>
               <div className="flex flex-wrap gap-4">
                 <a
-                  href="https://x.com/opensoxai"
+                  href="https://x.com/jackedAJ"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-link hover:text-link-hover transition-colors"
