@@ -281,6 +281,8 @@ const Pricing = () => {
           </div>
         </section>
 
+        <Features />
+
         {/* SECTION 3 - testimonials */}
         <TestimonialsSection />
         <div className="w-full border-b border-border text-center py-8 px-4">
