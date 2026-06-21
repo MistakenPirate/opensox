@@ -62,7 +62,7 @@ const ProRefsPage = (): JSX.Element | null => {
     }
   );
 
-  const refs = (data?.items ?? []) as ProRef[];
+  const refs = data?.items ?? [];
   const totalPages = data?.totalPages ?? 1;
 
   const isInitialLoading =

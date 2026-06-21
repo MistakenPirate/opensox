@@ -39,8 +39,12 @@ const RefsCmsPage = (): JSX.Element => {
 
   const authenticated = status === "authenticated";
 
-  const { data: isAdmin, isLoading: adminCheckLoading } =
-    trpc.refs.isAdmin.useQuery(undefined, { enabled: authenticated });
+  const {
+    data: isAdmin,
+    isLoading: adminCheckLoading,
+    isError: adminCheckError,
+    error: adminCheckErrorData,
+  } = trpc.refs.isAdmin.useQuery(undefined, { enabled: authenticated });
 
   if (status === "loading" || (authenticated && adminCheckLoading)) {
     return (
@@ -57,6 +61,20 @@ const RefsCmsPage = (): JSX.Element => {
         <Link href="/login" className="text-brand-purple-light hover:underline">
           Go to login
         </Link>
+      </CenteredMessage>
+    );
+  }
+
+  if (adminCheckError) {
+    return (
+      <CenteredMessage>
+        <p className="text-text-primary font-semibold text-lg">
+          Couldn&apos;t verify admin access
+        </p>
+        <p className="text-text-secondary text-sm">
+          {adminCheckErrorData?.message ??
+            "A temporary error occurred. Please try again."}
+        </p>
       </CenteredMessage>
     );
   }
@@ -131,14 +149,27 @@ function RefList({
   onEdit: (ref: AdminRef) => void;
 }): JSX.Element {
   const utils = trpc.useUtils();
-  const { data, isLoading } = trpc.refs.adminList.useQuery();
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+  } = trpc.refs.adminList.useQuery();
   const deleteRef = trpc.refs.adminDelete.useMutation({
     onSuccess: () => utils.refs.adminList.invalidate(),
     onError: (error) =>
       window.alert(`Couldn't delete the reference: ${error.message}`),
   });
 
-  const refs = (data ?? []) as AdminRef[];
+  const refs = data ?? [];
+
+  if (isError) {
+    return (
+      <p className="text-text-secondary">
+        {error?.message ?? "Failed to load references. Please try again."}
+      </p>
+    );
+  }
 
   if (isLoading) {
     return <p className="text-text-secondary">Loading references...</p>;

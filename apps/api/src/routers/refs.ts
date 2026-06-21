@@ -13,12 +13,35 @@ import { AuthorizationError } from "../services/session.service.js";
 
 const categorySchema = z.enum(REF_CATEGORIES);
 
+const refUrlSchema = z
+  .string()
+  .trim()
+  .pipe(z.url({ protocol: /^https?$/ }));
+
 const refInputSchema = z.object({
   category: categorySchema,
   text: z.string().trim().min(1, "Text is required"),
-  url: z.string().trim().url("A valid URL is required"),
+  url: refUrlSchema,
   order: z.number().int().optional(),
 });
+
+function logRefMutation(
+  operation: "adminCreate" | "adminUpdate" | "adminDelete",
+  userId: string,
+  refId: string | undefined,
+  phase: "start" | "success"
+): void {
+  console.log(
+    JSON.stringify({
+      event: "ref_mutation",
+      operation,
+      userId,
+      refId,
+      phase,
+      timestamp: new Date().toISOString(),
+    })
+  );
+}
 
 function toTRPCError(error: unknown): never {
   if (error instanceof AuthorizationError) {
@@ -64,18 +87,30 @@ export const refsRouter = router({
   adminCreate: adminProcedure
     .input(refInputSchema)
     .mutation(async ({ ctx, input }) => {
-      return refService.createRef(ctx.db.prisma, input);
+      const userId = (ctx as ProtectedContext).user.id;
+      logRefMutation("adminCreate", userId, undefined, "start");
+      const ref = await refService.createRef(ctx.db.prisma, input);
+      logRefMutation("adminCreate", userId, ref.id, "success");
+      return ref;
     }),
 
   adminUpdate: adminProcedure
     .input(z.object({ id: z.string().min(1), data: refInputSchema }))
     .mutation(async ({ ctx, input }) => {
-      return refService.updateRef(ctx.db.prisma, input.id, input.data);
+      const userId = (ctx as ProtectedContext).user.id;
+      logRefMutation("adminUpdate", userId, input.id, "start");
+      const ref = await refService.updateRef(ctx.db.prisma, input.id, input.data);
+      logRefMutation("adminUpdate", userId, ref.id, "success");
+      return ref;
     }),
 
   adminDelete: adminProcedure
     .input(z.object({ id: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
-      return refService.deleteRef(ctx.db.prisma, input.id);
+      const userId = (ctx as ProtectedContext).user.id;
+      logRefMutation("adminDelete", userId, input.id, "start");
+      const result = await refService.deleteRef(ctx.db.prisma, input.id);
+      logRefMutation("adminDelete", userId, input.id, "success");
+      return result;
     }),
 });

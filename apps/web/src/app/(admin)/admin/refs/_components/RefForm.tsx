@@ -41,6 +41,7 @@ export function RefForm({
   onCancelAction,
 }: RefFormProps): JSX.Element {
   const [values, setValues] = useState<RefFormValues>(initialValues ?? EMPTY);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const update = <K extends keyof RefFormValues>(
     key: K,
@@ -49,15 +50,29 @@ export function RefForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const text = values.text.trim();
+    const url = values.url.trim();
+
+    if (!text || !url) {
+      setSubmitError("Text and link are required.");
+      return;
+    }
+
+    setSubmitError(null);
     onSubmitAction({
       ...values,
-      text: values.text.trim(),
-      url: values.url.trim(),
+      text,
+      url,
     });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {submitError ? (
+        <p className="text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+          {submitError}
+        </p>
+      ) : null}
       <div>
         <label
           htmlFor="ref-category"
@@ -124,9 +139,12 @@ export function RefForm({
         <input
           id="ref-order"
           type="number"
+          step={1}
           className={inputClass}
           value={values.order}
-          onChange={(e) => update("order", Number(e.target.value) || 0)}
+          onChange={(e) =>
+            update("order", Number.parseInt(e.target.value, 10) || 0)
+          }
         />
       </div>
 

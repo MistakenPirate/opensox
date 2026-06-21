@@ -43,7 +43,12 @@ type ProRefModel = {
   }) => Promise<PublicRef>;
   update: (args: {
     where: { id: string };
-    data: { category: RefCategory; text: string; url: string; order: number };
+    data: {
+      category: RefCategory;
+      text: string;
+      url: string;
+      order?: number;
+    };
   }) => Promise<PublicRef>;
   delete: (args: { where: { id: string } }) => Promise<unknown>;
 };
@@ -165,14 +170,24 @@ export const refService = {
   },
 
   async updateRef(db: Db, id: string, input: RefInput) {
+    const data: {
+      category: RefCategory;
+      text: string;
+      url: string;
+      order?: number;
+    } = {
+      category: input.category,
+      text: input.text,
+      url: input.url,
+    };
+
+    if (input.order !== undefined) {
+      data.order = input.order;
+    }
+
     return refDb(db).proRef.update({
       where: { id },
-      data: {
-        category: input.category,
-        text: input.text,
-        url: input.url,
-        order: input.order ?? 0,
-      },
+      data,
     });
   },
 

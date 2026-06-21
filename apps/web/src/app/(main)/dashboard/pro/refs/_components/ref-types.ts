@@ -1,21 +1,7 @@
-export type RefCategory =
-  | "software"
-  | "ai"
-  | "ui"
-  | "open_source"
-  | "content"
-  | "problem_solving"
-  | "life"
-  | "misc";
+import type { PublicRef } from "../../../../../../../../api/src/services/ref.service";
 
-export interface ProRef {
-  id: string;
-  category: RefCategory;
-  text: string;
-  url: string;
-  order: number;
-  createdAt: Date;
-}
+export type ProRef = PublicRef;
+export type RefCategory = PublicRef["category"];
 
 export const CATEGORY_LABELS: Record<RefCategory, string> = {
   software: "Software",
