@@ -176,3 +176,27 @@ model ProModuleLink {
 
   @@index([moduleId, order])
 }
+
+enum RefCategory {
+  software
+  ai
+  ui
+  open_source
+  content
+  problem_solving
+  life
+  misc
+}
+
+model ProRef {
+  id        String      @id @default(cuid())
+  category  RefCategory
+  text      String
+  url       String
+  order     Int         @default(0)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([category])
+  @@index([order])
+}
