@@ -16,20 +16,6 @@ const Features = () => {
     <div className="flex flex-col border-b border-border">
       <Header title="Explore Features" />
       <div className="relative min-h-[600px] px-[30px] lg:min-h-[720px] lg:px-[50px]">
-        <div
-          style={{
-            ...patternStyle,
-            borderRight: `1px solid ${colors.border.DEFAULT}`,
-          }}
-          className="absolute left-0 top-0 h-full w-[30px] lg:w-[50px]"
-        />
-        <div
-          style={{
-            ...patternStyle,
-            borderLeft: `1px solid ${colors.border.DEFAULT}`,
-          }}
-          className="absolute right-0 top-0 h-full w-[30px] lg:w-[50px]"
-        />
         <ExploreFeaturesDashboard />
       </div>
     </div>

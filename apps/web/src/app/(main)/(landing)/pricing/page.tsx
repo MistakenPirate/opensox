@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { ShineBorder } from "@/components/ui/shine-borders";
 import PrimaryButton from "@/components/ui/custom-button";
+import Features from "@/components/features/features";
 import dynamic from "next/dynamic";
 import { trpc } from "@/lib/trpc";
 import { formatApproxPlanPrice } from "@/lib/format-plan-price";
@@ -365,6 +366,7 @@ const Pricing = () => {
               </div>
             </div>
           </div>
+          <Features />
           <TestimonialsSection />
           <div className="border-b border-border text-center py-8 px-4">
             <p className="text-lg mb-4 text-text-secondary">
