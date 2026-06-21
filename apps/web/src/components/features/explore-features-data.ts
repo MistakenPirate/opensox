@@ -1,5 +1,6 @@
 import {
   BellIcon,
+  BookOpenIcon,
   CalendarDaysIcon,
   ChatBubbleLeftRightIcon,
   LockClosedIcon,
@@ -14,8 +15,6 @@ import {
   VideoCameraIcon,
 } from "@heroicons/react/24/outline";
 import type { ComponentType, SVGProps } from "react";
-
-export const SHARED_FEATURE_PREVIEW = "/assets/features/pro-preview.svg";
 
 export type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -32,7 +31,7 @@ export type FeatureIconName =
   | "ShieldAlert"
   | "Bell"
   | "Calendar"
-  | "Share2";
+  | "BookOpen";
 
 export type FeatureData = {
   id: number;
@@ -55,8 +54,22 @@ export const FEATURE_ICON_MAP: Record<FeatureIconName, HeroIcon> = {
   ShieldAlert: ShieldExclamationIcon,
   Bell: BellIcon,
   Calendar: CalendarDaysIcon,
-  Share2: ShareIcon,
+  BookOpen: BookOpenIcon,
 };
+
+const FEATURE_IMAGES = {
+  onboarding: "/assets/features/1onboardingcall.png",
+  community: "/assets/features/2community.png",
+  weeklySessions: "/assets/features/3weeklysessions.png",
+  unlimitedQna: "/assets/features/4unlimitedqna.png",
+  proModules: "/assets/features/5promodules.png",
+  weeklyContests: "/assets/features/6weeklycontests.png",
+  handPickedProjects: "/assets/features/7hand-pickedossprojects.png",
+  proRecordings: "/assets/features/8prorecordings.png",
+  privateThreads: "/assets/features/9pvtthreads.png",
+  updates: "/assets/features/10updates-n-opportunities.png",
+  prorefs: "/assets/features/11prorefs.png",
+} as const;
 
 export const FEATURES_DATA: FeatureData[] = [
   {
@@ -65,7 +78,7 @@ export const FEATURES_DATA: FeatureData[] = [
     description:
       "An onboarding call directly with me to set up the precise direction for your goals in open source.",
     icon: "PhoneCall",
-    image: SHARED_FEATURE_PREVIEW,
+    image: FEATURE_IMAGES.onboarding,
   },
   {
     id: 2,
@@ -73,7 +86,7 @@ export const FEATURES_DATA: FeatureData[] = [
     description:
       "Expert feedback and guidance on anything related to open source—be it programs like GSoC, LFX, Summer of Bitcoin, or landing remote jobs and internships at commercial open source startups.",
     icon: "Compass",
-    image: SHARED_FEATURE_PREVIEW,
+    image: FEATURE_IMAGES.privateThreads,
   },
   {
     id: 3,
@@ -81,7 +94,7 @@ export const FEATURES_DATA: FeatureData[] = [
     description:
       "A highly active, small-token, limited community full of cracked engineers where you get personal attention from me 24/7/365.",
     icon: "Users",
-    image: SHARED_FEATURE_PREVIEW,
+    image: FEATURE_IMAGES.community,
   },
   {
     id: 4,
@@ -89,7 +102,7 @@ export const FEATURES_DATA: FeatureData[] = [
     description:
       "Interactive weekly live sessions covering the exact technical and career topics of your choice.",
     icon: "Tv",
-    image: SHARED_FEATURE_PREVIEW,
+    image: FEATURE_IMAGES.weeklySessions,
   },
   {
     id: 5,
@@ -97,7 +110,7 @@ export const FEATURES_DATA: FeatureData[] = [
     description:
       "Ask anything, anytime, directly to me. Get your answers straight from the source with no TAs in the middle.",
     icon: "MessageSquare",
-    image: SHARED_FEATURE_PREVIEW,
+    image: FEATURE_IMAGES.unlimitedQna,
   },
   {
     id: 6,
@@ -105,7 +118,7 @@ export const FEATURES_DATA: FeatureData[] = [
     description:
       "Participate in weekly open-source contests designed around building in public and mastering first principles.",
     icon: "Trophy",
-    image: SHARED_FEATURE_PREVIEW,
+    image: FEATURE_IMAGES.weeklyContests,
   },
   {
     id: 7,
@@ -113,7 +126,7 @@ export const FEATURES_DATA: FeatureData[] = [
     description:
       "Access dedicated content on open source, building in public, and first principles that you can't find anywhere else on the internet. Exclusive to OpenSox Pro members.",
     icon: "Lock",
-    image: SHARED_FEATURE_PREVIEW,
+    image: FEATURE_IMAGES.proModules,
   },
   {
     id: 8,
@@ -121,7 +134,7 @@ export const FEATURES_DATA: FeatureData[] = [
     description:
       "Cut through the BS with hand-picked open-source projects so you can start contributing from day one.",
     icon: "Sparkles",
-    image: SHARED_FEATURE_PREVIEW,
+    image: FEATURE_IMAGES.handPickedProjects,
   },
   {
     id: 9,
@@ -129,7 +142,7 @@ export const FEATURES_DATA: FeatureData[] = [
     description:
       "Access recordings of all previous weekly sessions, meticulously organized by topics and precise timestamps.",
     icon: "Video",
-    image: SHARED_FEATURE_PREVIEW,
+    image: FEATURE_IMAGES.proRecordings,
   },
   {
     id: 10,
@@ -137,7 +150,7 @@ export const FEATURES_DATA: FeatureData[] = [
     description:
       "Wanna ask something personal? Open a secure, private thread with me anytime.",
     icon: "ShieldAlert",
-    image: SHARED_FEATURE_PREVIEW,
+    image: FEATURE_IMAGES.privateThreads,
   },
   {
     id: 11,
@@ -145,7 +158,7 @@ export const FEATURES_DATA: FeatureData[] = [
     description:
       "Stay ahead with the latest updates on anything related to open source, remote job openings, emerging tech, and more.",
     icon: "Bell",
-    image: SHARED_FEATURE_PREVIEW,
+    image: FEATURE_IMAGES.updates,
   },
   {
     id: 12,
@@ -153,14 +166,14 @@ export const FEATURES_DATA: FeatureData[] = [
     description:
       "Keep your momentum and stay accountable with daily stand-ups alongside the rest of the cohort.",
     icon: "Calendar",
-    image: SHARED_FEATURE_PREVIEW,
+    image: FEATURE_IMAGES.weeklySessions,
   },
   {
     id: 13,
-    title: "The Inner Circle Vault",
+    title: "Pro References",
     description:
-      "Anything else that I learn, build, or find valuable, I share directly here with my people.",
-    icon: "Share2",
-    image: SHARED_FEATURE_PREVIEW,
+      "A consolidated place of the best hand-picked resources and references on the internet.",
+    icon: "BookOpen",
+    image: FEATURE_IMAGES.prorefs,
   },
 ];

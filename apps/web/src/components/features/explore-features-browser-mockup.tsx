@@ -29,7 +29,7 @@ export default function ExploreFeaturesBrowserMockup({
       )}
     >
       {/* Browser chrome */}
-      <div className="flex items-center gap-3 border-b border-[#252525] bg-surface-secondary px-4 py-3">
+      <div className="flex items-center gap-3 border-b border-[#252525] bg-surface-secondary px-4 py-2">
         <div className="flex shrink-0 items-center gap-1.5">
           <span className="size-2.5 rounded-full bg-[#ff5f57]" />
           <span className="size-2.5 rounded-full bg-[#febc2e]" />
@@ -38,7 +38,9 @@ export default function ExploreFeaturesBrowserMockup({
         <div className="mx-auto w-full max-w-xs rounded-md border border-[#252525] bg-[#101010] px-3 py-1.5 text-center text-xs text-text-muted">
           app.opensox.ai
         </div>
-        <div className="w-[52px] shrink-0" />
+        <div className="w-[52px] shrink-0 flex justify-end">
+          <FeatureIcon className="size-4 text-text-muted" />
+        </div>
       </div>
 
       {/* Browser body */}
