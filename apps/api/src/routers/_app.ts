@@ -7,6 +7,7 @@ import { paymentRouter } from "./payment.js";
 import { sessionsRouter } from "./sessions.js";
 import { testimonialRouter } from "./testimonial.js";
 import { modulesRouter } from "./modules.js";
+import { refsRouter } from "./refs.js";
 import { z } from "zod";
 
 const testRouter = router({
@@ -27,6 +28,7 @@ export const appRouter = router({
   sessions: sessionsRouter,
   testimonial: testimonialRouter,
   modules: modulesRouter,
+  refs: refsRouter,
 });
 
 export type AppRouter = typeof appRouter;
