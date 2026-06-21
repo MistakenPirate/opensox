@@ -85,6 +85,18 @@ async function withRetry<T>(
   throw lastError;
 }
 
+type Db = ExtendedPrismaClient | PrismaClient;
+
+export type SessionTopicInput = { timestamp: string; topic: string };
+
+export type SessionInput = {
+  title: string;
+  description?: string | null | undefined;
+  youtubeUrl: string;
+  sessionDate: Date;
+  topics: SessionTopicInput[];
+};
+
 export const sessionService = {
   /**
    * Get all sessions for authenticated paid users
@@ -155,5 +167,59 @@ export const sessionService = {
 
       throw error;
     }
+  },
+
+  // --- Admin CMS (gated by adminProcedure in the router) ---
+
+  async listAllForAdmin(db: Db) {
+    return db.weeklySession.findMany({
+      include: { topics: { orderBy: { order: "asc" } } },
+      orderBy: { sessionDate: "desc" },
+    });
+  },
+
+  async createSession(db: Db, input: SessionInput) {
+    return db.weeklySession.create({
+      data: {
+        title: input.title,
+        description: input.description ?? null,
+        youtubeUrl: input.youtubeUrl,
+        sessionDate: input.sessionDate,
+        topics: {
+          create: input.topics.map((topic, index) => ({
+            timestamp: topic.timestamp,
+            topic: topic.topic,
+            order: index,
+          })),
+        },
+      },
+      include: { topics: { orderBy: { order: "asc" } } },
+    });
+  },
+
+  async updateSession(db: Db, id: string, input: SessionInput) {
+    return db.weeklySession.update({
+      where: { id },
+      data: {
+        title: input.title,
+        description: input.description ?? null,
+        youtubeUrl: input.youtubeUrl,
+        sessionDate: input.sessionDate,
+        topics: {
+          deleteMany: {},
+          create: input.topics.map((topic, index) => ({
+            timestamp: topic.timestamp,
+            topic: topic.topic,
+            order: index,
+          })),
+        },
+      },
+      include: { topics: { orderBy: { order: "asc" } } },
+    });
+  },
+
+  async deleteSession(db: Db, id: string) {
+    await db.weeklySession.delete({ where: { id } });
+    return { id };
   },
 };
