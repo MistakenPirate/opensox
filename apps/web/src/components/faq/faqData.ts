@@ -7,7 +7,7 @@ export const faqs: FAQ[] = [
   {
     question: "What is Opensox AI?",
     answer:
-      "OpenSox is a platform to help developers find and contribute to Open Source projects that match their skills and interests and get opportunities (Jobs/Internships/Bounties) in Open Source companies.",
+      "Opensox is a platform to help developers find and contribute to Open Source projects that match their skills and interests and get opportunities (Jobs/Internships/Bounties) in Open Source companies.",
   },
   {
     question: "How can I find a project to contribute to?",

@@ -166,8 +166,7 @@ export default function ExploreFeaturesDashboard() {
       <div className="mx-auto flex h-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-border bg-surface-primary">
         <div className="flex flex-col gap-4 border-b border-border px-5 py-5 sm:flex-row sm:items-center sm:justify-between lg:px-8">
           <p className="max-w-xl text-sm text-text-tertiary lg:text-base">
-            Everything included in OpenSox Pro — mentorship, community, and
-            career acceleration.
+            Glimpse of what you get in Opensox Pro.
           </p>
           <Link href="/pricing" className="shrink-0 self-start sm:self-center">
             <PrimaryButton classname="px-5 py-2.5 text-sm whitespace-nowrap">
@@ -186,7 +185,7 @@ export default function ExploreFeaturesDashboard() {
                   <p className="text-sm font-medium text-text-primary">
                     Explore Features
                   </p>
-                  <p className="text-xs text-text-muted">OpenSox Pro</p>
+                  <p className="text-xs text-text-muted">Opensox Pro</p>
                 </div>
               </div>
             </div>

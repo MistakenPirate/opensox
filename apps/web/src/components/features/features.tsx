@@ -13,7 +13,7 @@ const patternStyle = {
 
 const Features = () => {
   return (
-    <div className="flex flex-col border-b border-border">
+    <div id="explore-features" className="flex flex-col border-b border-border">
       <Header title="Explore Features" />
       <div className="relative min-h-[600px] px-[30px] lg:min-h-[720px] lg:px-[50px]">
         <ExploreFeaturesDashboard />
