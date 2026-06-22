@@ -101,44 +101,46 @@ export async function validateAvatarUrl(avatarUrl: string): Promise<void> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-    const response = await fetch(avatarUrl, {
-      method: "HEAD",
-      signal: controller.signal,
-      redirect: "error",
-      headers: {
-        "User-Agent": "Opensox-Avatar-Validator/1.0",
-      },
-    });
-
-    clearTimeout(timeoutId);
-
-    // Check if request was successful
-    if (!response.ok) {
-      throw new TRPCError({
-        code: "BAD_REQUEST",
-        message: `Avatar URL is not accessible (HTTP ${response.status})`,
+    try {
+      const response = await fetch(avatarUrl, {
+        method: "HEAD",
+        signal: controller.signal,
+        redirect: "error",
+        headers: {
+          "User-Agent": "Opensox-Avatar-Validator/1.0",
+        },
       });
-    }
 
-    // Step 8: Validate Content-Type is an image
-    const contentType = response.headers.get("content-type");
-    if (!contentType || !contentType.startsWith("image/")) {
-      throw new TRPCError({
-        code: "BAD_REQUEST",
-        message: `Avatar URL must point to an image file. Received content-type: ${contentType || "unknown"}`,
-      });
-    }
-
-    // Step 9: Validate Content-Length is within limits
-    const contentLength = response.headers.get("content-length");
-    if (contentLength) {
-      const sizeBytes = parseInt(contentLength, 10);
-      if (sizeBytes > MAX_IMAGE_SIZE_BYTES) {
+      // Check if request was successful
+      if (!response.ok) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: `Avatar image is too large. Maximum size: ${MAX_IMAGE_SIZE_BYTES / 1024 / 1024}MB`,
+          message: `Avatar URL is not accessible (HTTP ${response.status})`,
         });
       }
+
+      // Step 8: Validate Content-Type is an image
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.startsWith("image/")) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Avatar URL must point to an image file. Received content-type: ${contentType || "unknown"}`,
+        });
+      }
+
+      // Step 9: Validate Content-Length is within limits
+      const contentLength = response.headers.get("content-length");
+      if (contentLength) {
+        const sizeBytes = parseInt(contentLength, 10);
+        if (sizeBytes > MAX_IMAGE_SIZE_BYTES) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `Avatar image is too large. Maximum size: ${MAX_IMAGE_SIZE_BYTES / 1024 / 1024}MB`,
+          });
+        }
+      }
+    } finally {
+      clearTimeout(timeoutId);
     }
   } catch (error) {
     // Handle fetch errors
