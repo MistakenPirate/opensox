@@ -50,6 +50,7 @@ export default function ExploreFeaturesBrowserMockup({
             src={imageSrc}
             alt={featureTitle}
             fill
+            unoptimized
             className="object-cover object-top"
             onError={() => setImageError(true)}
             sizes="(max-width: 768px) 100vw, 60vw"
