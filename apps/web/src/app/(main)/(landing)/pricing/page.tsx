@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { ShineBorder } from "@/components/ui/shine-borders";
 import PrimaryButton from "@/components/ui/custom-button";
+import Features from "@/components/features/features";
 import dynamic from "next/dynamic";
 import { trpc } from "@/lib/trpc";
 import { formatApproxPlanPrice } from "@/lib/format-plan-price";
@@ -18,7 +19,7 @@ const Footer = dynamic(
   {
     ssr: false,
     loading: () => null,
-  }
+  },
 );
 
 // lazy load PaymentFlow - it's inside pricing card but can wait
@@ -27,7 +28,7 @@ const PaymentFlow = dynamic(
   {
     ssr: false,
     loading: () => null,
-  }
+  },
 );
 const opensoxFeatures = [
   {
@@ -64,9 +65,7 @@ const opensoxFeatures = [
   },
 ];
 
-type WhySubItem =
-  | { kind: "text"; content: string }
-  | { kind: "pro_slots" };
+type WhySubItem = { kind: "text"; content: string } | { kind: "pro_slots" };
 
 const whySub: WhySubItem[] = [
   {
@@ -125,7 +124,7 @@ const Pricing = () => {
 
   const { data: proMemberCountData } = trpc.payment.getProMemberCount.useQuery(
     { planId: premiumPlanId ?? "" },
-    { enabled: planIdOk }
+    { enabled: planIdOk },
   );
 
   useEffect(() => {
@@ -138,6 +137,12 @@ const Pricing = () => {
       }
       if (window.location.hash === "#testimonials") {
         const element = document.getElementById("testimonials");
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
+      if (window.location.hash === "#explore-features") {
+        const element = document.getElementById("explore-features");
         if (element) {
           element.scrollIntoView({ behavior: "smooth", block: "start" });
         }
@@ -335,8 +340,7 @@ const Pricing = () => {
                           </span>
                         ) : (
                           <span className="min-w-0">
-                            This offer is only available for the first 200
-                            users
+                            This offer is only available for the first 200 users
                           </span>
                         )
                       ) : (
@@ -365,6 +369,7 @@ const Pricing = () => {
               </div>
             </div>
           </div>
+          <Features />
           <TestimonialsSection />
           <div className="border-b border-border text-center py-8 px-4">
             <p className="text-lg mb-4 text-text-secondary">
@@ -480,12 +485,12 @@ const SecondaryPricingCard = ({ callbackUrl }: { callbackUrl: string }) => {
 
   const { data: publicPlan } = trpc.payment.getPublicPlan.useQuery(
     { planId: premiumPlanId ?? "" },
-    { enabled: planIdOk }
+    { enabled: planIdOk },
   );
 
   const { data: proMemberCountData } = trpc.payment.getProMemberCount.useQuery(
     { planId: premiumPlanId ?? "" },
-    { enabled: planIdOk }
+    { enabled: planIdOk },
   );
 
   return (
@@ -562,7 +567,10 @@ const SecondaryPricingCard = ({ callbackUrl }: { callbackUrl: string }) => {
               <div className="flex items-center gap-3 mt-3 flex-wrap">
                 {publicPlan ? (
                   <p className="text-lg text-white-400">
-                    {formatApproxPlanPrice(publicPlan.price, publicPlan.currency)}
+                    {formatApproxPlanPrice(
+                      publicPlan.price,
+                      publicPlan.currency,
+                    )}
                   </p>
                 ) : null}
               </div>
@@ -664,7 +672,7 @@ const TestimonialsSection = () => {
       content: (
         <div className="space-y-3 text-pretty">
           <p>
-            Okay so there are a few things I genuinely value about OpenSox Pro,
+            Okay so there are a few things I genuinely value about Opensox Pro,
             and I&apos;ll focus on the core points because everything else is
             just a natural extension of these.
           </p>
@@ -699,7 +707,7 @@ const TestimonialsSection = () => {
               right direction.
             </li>
             <li>
-              Overall, I&apos;d absolutely recommend OpenSox Pro to anyone
+              Overall, I&apos;d absolutely recommend Opensox Pro to anyone
               serious about open source. The personalized guidance is exactly
               what most of us hope for, since everyone is at a different stage
               of their journey.

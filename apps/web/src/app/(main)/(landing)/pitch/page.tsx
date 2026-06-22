@@ -227,6 +227,17 @@ const Pitch = () => {
                     a single dime of extra money.
                   </li>
                 </ul>
+                <p>
+                  see a{" "}
+                  <Link
+                    href="/pricing#explore-features"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-link hover:text-link-hover underline"
+                  >
+                    glimpse of what you get in the opensox pro
+                  </Link>
+                </p>
               </div>
 
               <div className="border-t border-border pt-8 space-y-4">
