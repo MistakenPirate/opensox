@@ -7,7 +7,7 @@ import {
   SparklesIcon,
 } from "@heroicons/react/24/outline";
 import { AnimatePresence, motion } from "framer-motion";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import PrimaryButton from "@/components/ui/custom-button";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,7 @@ const AUTO_ADVANCE_MS = 5000;
 const RESUME_AFTER_MS = 9000;
 
 export default function ExploreFeaturesDashboard() {
+  const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
   const autoIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const resumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -168,12 +169,13 @@ export default function ExploreFeaturesDashboard() {
           <p className="max-w-xl text-sm text-text-tertiary lg:text-base">
             Glimpse of what you get in Opensox Pro.
           </p>
-          <Link href="/pricing" className="shrink-0 self-start sm:self-center">
-            <PrimaryButton classname="px-5 py-2.5 text-sm whitespace-nowrap">
-              <ArrowRightIcon className="size-4" />
-              Invest Now
-            </PrimaryButton>
-          </Link>
+          <PrimaryButton
+            onClick={() => router.push("/pricing")}
+            classname="shrink-0 self-start sm:self-center px-5 py-2.5 text-sm whitespace-nowrap"
+          >
+            <ArrowRightIcon className="size-4" />
+            Invest Now
+          </PrimaryButton>
         </div>
 
         <div className="flex min-h-0 flex-1 flex-col lg:grid lg:grid-cols-[minmax(240px,320px)_1fr]">
