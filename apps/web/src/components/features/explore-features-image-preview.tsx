@@ -38,7 +38,6 @@ export default function ExploreFeaturesImagePreview({
           src={imageSrc}
           alt={featureTitle}
           fill
-          priority
           unoptimized
           className="object-contain object-center"
           onError={() => setImageError(true)}
