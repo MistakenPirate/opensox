@@ -36,6 +36,7 @@ type FeatureValue = boolean | string;
 
 interface ComparisonFeature {
   name: string;
+  upcoming?: boolean;
   free: FeatureValue;
   pro: FeatureValue;
   proPlus: FeatureValue;
@@ -54,7 +55,7 @@ const comparisonFeatures: ComparisonFeature[] = [
     pro: true,
     proPlus: true,
   },
-  { name: "OSS sheet", free: "30 days", pro: true, proPlus: true },
+  { name: "OSS sheet", free: true, pro: true, proPlus: true },
   { name: "Onboarding call", free: false, pro: true, proPlus: true },
   {
     name: "OSS guidance (jobs, GSoC, LFX, etc.)",
@@ -72,13 +73,13 @@ const comparisonFeatures: ComparisonFeature[] = [
   { name: "Unlimited QnAs", free: false, pro: true, proPlus: true },
   { name: "Weekly contests", free: false, pro: true, proPlus: true },
   {
-    name: "Pro modules (open source, build in public, first principles)",
+    name: "Pro modules",
     free: false,
     pro: true,
     proPlus: true,
   },
   {
-    name: "Hand-picked open source projects",
+    name: "Hand-picked OSS projects",
     free: false,
     pro: true,
     proPlus: true,
@@ -97,18 +98,20 @@ const comparisonFeatures: ComparisonFeature[] = [
     proPlus: true,
   },
   { name: "Daily stand-ups", free: false, pro: true, proPlus: true },
-  { name: "Pro refs", free: false, pro: true, proPlus: true },
+  { name: "Pro References", free: false, pro: true, proPlus: true },
   {
-    name: "First principles mega-module (50+ modules)",
+    name: "First principles mega-module (20+ modules)",
+    upcoming: true,
     free: false,
     pro: false,
-    proPlus: "Upcoming",
+    proPlus: true,
   },
   {
-    name: "Build in public mega-module (50+ modules)",
+    name: "Build in public mega-module (20+ modules)",
+    upcoming: true,
     free: false,
     pro: false,
-    proPlus: "Upcoming",
+    proPlus: true,
   },
 ];
 
@@ -153,7 +156,7 @@ const Pricing = () => {
     },
     {
       key: "pro4",
-      name: "Pro Plus",
+      name: "Pro+",
       price: "$99",
       originalPrice: "$199",
       period: "/ 4 years",
@@ -228,7 +231,16 @@ const Pricing = () => {
                 </span>
               </h1>
               <p className="text-2xl font-medium tracking-tight text-text-secondary sm:text-3xl">
-                a small and effective ecosystem for limited people.
+                a small and effective ecosystem for{" "}
+                <a
+                  href="/blog/scale-is-the-problem"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline decoration-brand-purple-light decoration-1 underline-offset-4 transition-colors hover:decoration-brand-purple"
+                >
+                  limited
+                </a>{" "}
+                people.
               </p>
               <p className="text-lg font-medium tracking-tight sm:text-xl">
                 learning <span className="text-[#a472ea]">Open Source.</span>{" "}
@@ -275,6 +287,8 @@ const Pricing = () => {
           <p className="text-lg mb-4 text-text-secondary">
             <Link
               href="/testimonials"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-brand-purple-light hover:text-brand-purple transition-colors underline"
             >
               see more
@@ -301,7 +315,7 @@ export default Pricing;
 const FEATURE_LABEL_WIDTH = "w-[9.5rem] shrink-0";
 
 const FEATURE_ROW_LAYOUT =
-  "flex items-start gap-4 border-b border-border py-3.5 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start lg:gap-12";
+  "flex items-start gap-4 border-b border-border py-3.5 lg:grid lg:grid-cols-[minmax(0,max-content)_1fr] lg:items-center lg:gap-6";
 
 const MOBILE_TABLE_SCROLL =
   "-mx-4 overflow-x-auto overscroll-x-contain px-4 lg:mx-0 lg:overflow-visible lg:px-0";
@@ -321,7 +335,7 @@ const PlanColumns = ({
 }) => (
   <div
     role={role}
-    className={`flex shrink-0 ${align === "start" ? "ml-0 justify-start pl-0 pr-0" : "ml-auto justify-end pl-8 pr-4 lg:pl-12 lg:pr-6"} ${PLAN_COLUMNS_GAP} ${className}`}
+    className={`flex shrink-0 ${align === "start" ? "ml-0 justify-start pl-0 pr-0" : "ml-auto justify-end pl-8 pr-4 lg:pl-0 lg:pr-6"} ${PLAN_COLUMNS_GAP} ${className}`}
   >
     {children}
   </div>
@@ -344,12 +358,18 @@ const PlanColumn = ({
   </div>
 );
 
+const UpcomingBadge = () => (
+  <span className="inline-flex shrink-0 items-center rounded-md border border-success-border/40 bg-success-bg px-2 py-0.5 text-[10px] font-semibold text-success-text">
+    Upcoming
+  </span>
+);
+
 const FeatureCell = ({ value }: { value: FeatureValue }) => {
   if (value === true) {
     return (
       <Check
-        className="h-3.5 w-3.5 text-brand-purple-light"
-        strokeWidth={2}
+        className="h-5 w-5 text-brand-purple-light"
+        strokeWidth={2.75}
         aria-label="Included"
       />
     );
@@ -358,19 +378,18 @@ const FeatureCell = ({ value }: { value: FeatureValue }) => {
   if (value === false) {
     return (
       <X
-        className="h-3.5 w-3.5 text-destructive"
-        strokeWidth={2}
+        className="h-5 w-5 text-destructive"
+        strokeWidth={2.75}
         aria-label="Not included"
       />
     );
   }
 
-  return (
-    <span className="text-center text-xs text-text-secondary">{value}</span>
-  );
+  return <span className="text-center text-sm text-text-primary">{value}</span>;
 };
 
 const PRICING_BUTTON_CLASS = "w-full !py-2 !text-xs";
+const PRICING_INVEST_BUTTON_CLASS = "w-full !py-2.5 !text-sm !font-semibold";
 
 const PlanColumnHeader = ({
   tier,
@@ -382,6 +401,14 @@ const PlanColumnHeader = ({
   const router = useRouter();
   const planIdOk = typeof tier.planId === "string" && tier.planId.length > 0;
   const isPaid = tier.key !== "free";
+
+  const { data: publicPlan } = trpc.payment.getPublicPlan.useQuery(
+    { planId: tier.planId as string },
+    {
+      enabled: isPaid && planIdOk,
+      staleTime: 5 * 60 * 1000,
+    },
+  );
 
   return (
     <div
@@ -426,6 +453,17 @@ const PlanColumnHeader = ({
               {tier.period}
             </span>
           )}
+          {isPaid && planIdOk ? (
+            publicPlan ? (
+              <span className="text-sm font-semibold text-text-primary">
+                {formatApproxPlanPrice(publicPlan.price, publicPlan.currency)}
+              </span>
+            ) : (
+              <span className="text-sm invisible select-none" aria-hidden>
+                &nbsp;
+              </span>
+            )
+          ) : null}
         </div>
       </div>
       <div className="w-full pt-4">
@@ -443,7 +481,7 @@ const PlanColumnHeader = ({
             planName={`Opensox ${tier.name}`}
             description={tier.paymentDescription}
             buttonText={planIdOk ? "Invest" : "Unavailable"}
-            buttonClassName={`${PRICING_BUTTON_CLASS} ${planIdOk ? "" : "!opacity-60 !cursor-not-allowed"}`}
+            buttonClassName={`${PRICING_INVEST_BUTTON_CLASS} ${planIdOk ? "" : "!opacity-60 !cursor-not-allowed"}`}
             callbackUrl={callbackUrl}
             buttonLocation="pricing_page"
           />
@@ -466,7 +504,7 @@ const PricingComparison = ({
 
   return (
     <div className="flex flex-col gap-6 lg:gap-14">
-      <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-stretch lg:gap-12">
+      <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_1fr] lg:items-stretch lg:gap-6">
         <div className="flex flex-col gap-3 pt-4">
           <h2 className="text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl lg:text-5xl">
             Choose your{" "}
@@ -475,7 +513,7 @@ const PricingComparison = ({
             </span>
           </h2>
           <p className="max-w-sm text-sm text-text-muted">
-            Start free, or go Pro to join the ecosystem.
+            Go Pro or Pro+ to join the ecosystem.
           </p>
         </div>
 
@@ -500,7 +538,7 @@ const PricingComparison = ({
           </span>
         </h2>
         <p className="max-w-sm text-sm text-text-muted">
-          Start free, or go Pro to join the ecosystem.
+          Go Pro or Pro+ to join the ecosystem.
         </p>
       </div>
 
@@ -539,14 +577,15 @@ const PricingComparison = ({
               <div key={feature.name} className={FEATURE_ROW_LAYOUT} role="row">
                 <p
                   role="rowheader"
-                  className={`${FEATURE_LABEL_WIDTH} min-w-0 pr-2 text-xs text-text-muted lg:w-auto lg:pr-0`}
+                  className={`${FEATURE_LABEL_WIDTH} flex min-w-0 flex-wrap items-center gap-2 pr-2 text-sm text-text-primary lg:w-auto lg:pr-6`}
                 >
-                  {feature.name}
+                  <span>{feature.name}</span>
+                  {feature.upcoming ? <UpcomingBadge /> : null}
                 </p>
                 <PlanColumns
                   align="start"
                   role="presentation"
-                  className="items-start lg:ml-auto lg:justify-end lg:pl-12 lg:pr-6 lg:items-center"
+                  className="items-start lg:ml-auto lg:justify-end lg:pr-6 lg:items-center"
                 >
                   <PlanColumn
                     role="cell"
@@ -572,6 +611,16 @@ const PricingComparison = ({
           </div>
         </div>
       </div>
+
+      <p className="text-sm text-text-muted">
+        Still not sure?{" "}
+        <Link
+          href="/pitch"
+          className="text-link hover:text-link-hover underline underline-offset-2 transition-colors"
+        >
+          Read my pitch to you.
+        </Link>
+      </p>
     </div>
   );
 };

@@ -2,20 +2,12 @@
 
 import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 import Footer from "@/components/landing-sections/footer";
-import PaymentFlow from "@/components/payment/PaymentFlow";
 import PrimaryButton from "@/components/ui/custom-button";
 import Header from "@/components/ui/header";
 
 const Pitch = () => {
-  const pathname = usePathname();
-  const premiumPlanId = process.env.NEXT_PUBLIC_YEARLY_PREMIUM_PLAN_ID;
-  const planIdOk =
-    typeof premiumPlanId === "string" && premiumPlanId.trim().length > 0;
-  const callbackUrl = `${pathname}#invest`;
-
   return (
     <>
       <main className="w-full overflow-hidden flex flex-col items-center justify-center relative pt-24 md:pt-28">
@@ -240,10 +232,18 @@ const Pitch = () => {
                 </p>
               </div>
 
-              <div className="border-t border-border pt-8 space-y-4">
-                <h2 className="text-2xl lg:text-3xl font-bold text-brand-purple-light tracking-tight leading-tight [font-family:Helvetica,Arial,sans-serif]">
-                  but how will you be able to give personal attention and do all
-                  of that if the number of opensox pro members grows in the future?
+              <div id="my-scale" className="border-t border-border pt-8 space-y-4">
+                <h2 className="text-2xl lg:text-3xl font-bold tracking-tight leading-tight [font-family:Helvetica,Arial,sans-serif]">
+                  <a
+                    href="/pitch#my-scale"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-brand-purple-light decoration-brand-purple-light decoration-1 transition-colors"
+                  >
+                    but how will you be able to give personal attention and do all
+                    of that if the number of opensox pro members grows in the
+                    future?
+                  </a>
                 </h2>
                 <p>
                   i thought about this a lot. and made a hard decision to{" "}
@@ -315,23 +315,9 @@ const Pitch = () => {
                     how to invest?
                   </h2>
                   <div className="flex justify-center">
-                    {planIdOk ? (
-                      <div className="w-full max-w-[180px]">
-                        <PaymentFlow
-                          planId={premiumPlanId}
-                          planName="Opensox Pro"
-                          description="Annual Subscription"
-                          buttonText="im in"
-                          buttonClassName="w-full"
-                          callbackUrl={callbackUrl}
-                          buttonLocation="pitch_page"
-                        />
-                      </div>
-                    ) : (
-                      <Link href="/pricing" className="w-full max-w-[180px]">
-                        <PrimaryButton classname="w-full">im in</PrimaryButton>
-                      </Link>
-                    )}
+                    <Link href="/pricing#pro-price-card" className="w-full max-w-[180px]">
+                      <PrimaryButton classname="w-full">im in</PrimaryButton>
+                    </Link>
                   </div>
                 </div>
 

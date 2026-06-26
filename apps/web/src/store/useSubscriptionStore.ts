@@ -3,6 +3,7 @@ import { create } from "zustand";
 interface Subscription {
   id: string;
   planName: string | null;
+  durationMonths: number | null;
   startDate: Date;
   endDate: Date;
   status: string;

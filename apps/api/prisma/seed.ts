@@ -18,10 +18,10 @@ async function main() {
   // Create test plan (1 rupee test plan - 1 year)
   const testPlan = await prisma.plan.upsert({
     where: { id: '385b8215-d70f-473e-81c9-68a673c0d2fc-test' },
-    update: { durationMonths: 12 },
+    update: { durationMonths: 12, name: 'Pro' },
     create: {
       id: '385b8215-d70f-473e-81c9-68a673c0d2fc-test',
-      name: 'Test Plan',
+      name: 'Pro',
       interval: 'yearly',
       durationMonths: 12,
       price: 100, // 1 rupee in paise
@@ -33,10 +33,10 @@ async function main() {
   // Create 4-year test plan (dummy plan for the 48-month duration)
   const fourYearPlan = await prisma.plan.upsert({
     where: { id: '385b8215-d70f-473e-81c9-68a673c0d2fc-4yr-test' },
-    update: { durationMonths: 48 },
+    update: { durationMonths: 48, name: 'Pro+' },
     create: {
       id: '385b8215-d70f-473e-81c9-68a673c0d2fc-4yr-test',
-      name: 'Pro 4 Year (Test)',
+      name: 'Pro+',
       interval: 'yearly',
       durationMonths: 48,
       price: 100, // 1 rupee in paise (test price)
