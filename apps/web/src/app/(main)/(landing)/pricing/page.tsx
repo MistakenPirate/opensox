@@ -603,6 +603,8 @@ const PricingComparison = ({
         Still not sure?{" "}
         <Link
           href="/pitch"
+          target="_blank"
+          rel="noopener noreferrer"
           className="text-link hover:text-link-hover underline underline-offset-2 transition-colors"
         >
           Read my pitch to you.
