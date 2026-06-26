@@ -261,6 +261,7 @@ const Pricing = () => {
                   alt="jackedAJ"
                   fill
                   priority
+                  unoptimized
                   sizes="(max-width: 1024px) 100vw, 384px"
                   className="object-cover object-top"
                 />
