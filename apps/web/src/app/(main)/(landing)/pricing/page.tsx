@@ -388,8 +388,8 @@ const FeatureCell = ({ value }: { value: FeatureValue }) => {
   return <span className="text-center text-sm text-text-primary">{value}</span>;
 };
 
-const PRICING_BUTTON_CLASS = "w-full !py-2 !text-xs";
-const PRICING_INVEST_BUTTON_CLASS = "w-full !py-2.5 !text-sm !font-semibold";
+const PRICING_PLAN_BUTTON_CLASS =
+  "w-full !py-2.5 !text-sm !font-semibold";
 
 const PlanColumnHeader = ({
   tier,
@@ -411,46 +411,33 @@ const PlanColumnHeader = ({
   );
 
   return (
-    <div
-      className={`relative flex h-full w-full flex-col overflow-hidden rounded-3xl ${
-        tier.highlight ? "shadow-[0_0_70px_-20px_rgba(113,80,231,0.55)]" : ""
-      } ${className ?? ""}`}
-    >
-      <Image
-        src="/assets/card_bg.svg"
-        alt=""
-        fill
-        loading="lazy"
-        className="absolute -z-10 h-full w-full object-cover object-bottom"
-      />
-      <ShineBorder shineColor={["#7150E7", "#C89BFF", "#432BA0"]} />
-
-      <div className="flex flex-col gap-5 p-6 lg:p-7">
-        <div className="flex items-center justify-between gap-3">
-          <div className="relative h-12 w-12">
-            <Image
-              src="/assets/logo_var2.svg"
-              alt="Opensox"
-              fill
-              loading="lazy"
-              className="size-full object-cover"
-            />
-          </div>
-          {tier.badge ? (
-            <span className="rounded-full bg-gradient-to-b from-[#7150E7] to-[#432ba0] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
-              {tier.badge}
-            </span>
-          ) : null}
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <h2 className="text-2xl font-semibold tracking-tight">{tier.name}</h2>
-          <div className="flex items-end gap-2">
-            <span className="text-5xl font-semibold tracking-tight">
+    <div className="flex h-full w-full flex-col justify-between text-center">
+      <div className="flex flex-col items-center">
+        <p
+          className={`px-3 py-1.5 text-lg font-medium tracking-wide ${isPaid ? "text-brand-purple-light" : "text-text-muted"}`}
+        >
+          {tier.name}
+        </p>
+        <div className="flex flex-col items-center gap-0.5">
+          {isPaid ? (
+            <p className="flex flex-wrap items-baseline justify-center gap-x-1.5 text-2xl font-semibold tracking-tight text-text-primary sm:text-3xl">
+              <span>{tier.price}</span>
+              <span className="text-sm font-normal text-text-muted">
+                {tier.period}
+              </span>
+            </p>
+          ) : (
+            <p className="text-2xl font-semibold tracking-tight text-text-primary sm:text-3xl">
               {tier.price}
+            </p>
+          )}
+          {tier.originalPrice ? (
+            <span className="text-sm font-normal text-text-muted line-through">
+              {tier.originalPrice}
             </span>
-            <span className="pb-1 text-base text-text-tertiary">
-              {tier.period}
+          ) : (
+            <span className="text-sm invisible select-none" aria-hidden>
+              &nbsp;
             </span>
           )}
           {isPaid && planIdOk ? (
@@ -469,11 +456,10 @@ const PlanColumnHeader = ({
       <div className="w-full pt-4">
         {!isPaid ? (
           <PrimaryButton
-            classname={PRICING_BUTTON_CLASS}
+            classname={PRICING_PLAN_BUTTON_CLASS}
             onClick={() => router.push("/dashboard/home")}
           >
-            <Terminal className="h-3.5 w-3.5" />
-            Start Free
+            Start free
           </PrimaryButton>
         ) : (
           <PaymentFlow
@@ -481,7 +467,7 @@ const PlanColumnHeader = ({
             planName={`Opensox ${tier.name}`}
             description={tier.paymentDescription}
             buttonText={planIdOk ? "Invest" : "Unavailable"}
-            buttonClassName={`${PRICING_INVEST_BUTTON_CLASS} ${planIdOk ? "" : "!opacity-60 !cursor-not-allowed"}`}
+            buttonClassName={`${PRICING_PLAN_BUTTON_CLASS} ${planIdOk ? "" : "!opacity-60 !cursor-not-allowed"}`}
             callbackUrl={callbackUrl}
             buttonLocation="pricing_page"
           />
