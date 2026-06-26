@@ -8,6 +8,7 @@ import { ActiveTag } from "@/components/ui/ActiveTag";
 import { useSession } from "next-auth/react";
 import type { Session } from "next-auth";
 import { useSearchParams } from "next/navigation";
+import { formatSubscriptionPlanLabel } from "@/lib/format-subscription-plan-label";
 
 const AccountPageContent = memo(function AccountPageContent({
   isPaidUser,
@@ -21,6 +22,8 @@ const AccountPageContent = memo(function AccountPageContent({
 }: {
   isPaidUser: boolean;
   subscription: {
+    planName: string | null;
+    durationMonths: number | null;
     startDate: Date;
     endDate: Date;
   } | null;
@@ -31,7 +34,10 @@ const AccountPageContent = memo(function AccountPageContent({
   discordMessage: string | null;
   discordError: string | null;
 }) {
-  const plan = useMemo(() => (isPaidUser ? "Pro" : "Free"), [isPaidUser]);
+  const plan = useMemo(
+    () => formatSubscriptionPlanLabel(isPaidUser, subscription),
+    [isPaidUser, subscription],
+  );
   const joinedOn = useMemo(() => {
     if (!subscription?.startDate) return "—";
     return new Date(subscription.startDate).toLocaleDateString("en-IN", {

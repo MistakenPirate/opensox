@@ -32,6 +32,9 @@ export const userService = {
       include: {
         plan: true,
       },
+      orderBy: {
+        startDate: "desc",
+      },
     });
 
     return {
@@ -40,6 +43,7 @@ export const userService = {
         ? {
             id: subscription.id,
             planName: subscription.plan?.name,
+            durationMonths: subscription.plan?.durationMonths ?? null,
             startDate: subscription.startDate,
             endDate: subscription.endDate,
             status: subscription.status,

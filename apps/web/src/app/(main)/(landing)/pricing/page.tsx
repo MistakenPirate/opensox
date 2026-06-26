@@ -1,13 +1,12 @@
 "use client";
 import Header from "@/components/ui/header";
-import { Check, CornerDownRight, Target, Terminal } from "lucide-react";
+import PrimaryButton from "@/components/ui/custom-button";
+import { Check, Terminal, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ShineBorder } from "@/components/ui/shine-borders";
-import PrimaryButton from "@/components/ui/custom-button";
 import Features from "@/components/features/features";
 import dynamic from "next/dynamic";
 import { trpc } from "@/lib/trpc";
@@ -30,102 +29,141 @@ const PaymentFlow = dynamic(
     loading: () => null,
   },
 );
-const opensoxFeatures = [
+
+type TierKey = "free" | "pro1" | "pro4";
+
+type FeatureValue = boolean | string;
+
+interface ComparisonFeature {
+  name: string;
+  upcoming?: boolean;
+  free: FeatureValue;
+  pro: FeatureValue;
+  proPlus: FeatureValue;
+}
+
+const comparisonFeatures: ComparisonFeature[] = [
   {
-    id: 1,
-    title: "Opensox Advanced search tool",
-    description:
-      "One and only tool in the market that let you find open source with blizzing speed and scary accuracy. It will have:",
-    features: [
-      "Faster and accurate search of projects",
-      "Higher accuracy (so that you exactly land on your dream open source project)",
-      "Advanced filters like, GSOC, YC, funding, hire contributors, trending, niche (like AI, Core ML, Web3, MERN), bounties, and many more.",
-    ],
+    name: "Project search (legacy)",
+    free: true,
+    pro: true,
+    proPlus: true,
   },
   {
-    id: 2,
-    title: "30 days Opensox challenge sheet",
-    description: [
-      "A comprehensive sheet of 30+ modules along with detailed videos to give you a clear path to start rocking in open source.",
-      "It will contain videos, resouces and hand made docs.",
-      <>
-        In each of the 30 steps, you will learn, then apply, If stuck,
-        we&apos;ll help and then we&apos;ll do an accountability check.{" "}
-        <Link
-          href="https://www.youtube.com/playlist?list=PLiWTvT-J4wHhDh-Mngogynfusor-694G-"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:underline text-[#a472ea]"
-        >
-          Check here.
-        </Link>
-      </>,
-    ],
-    features: [],
+    name: "Access to the general community",
+    free: true,
+    pro: true,
+    proPlus: true,
+  },
+  { name: "OSS sheet", free: true, pro: true, proPlus: true },
+  { name: "Onboarding call", free: false, pro: true, proPlus: true },
+  {
+    name: "OSS guidance (jobs, GSoC, LFX, etc.)",
+    free: false,
+    pro: true,
+    proPlus: true,
+  },
+  {
+    name: "Pro community",
+    free: false,
+    pro: true,
+    proPlus: true,
+  },
+  { name: "Weekly live sessions", free: false, pro: true, proPlus: true },
+  { name: "Unlimited QnAs", free: false, pro: true, proPlus: true },
+  { name: "Weekly contests", free: false, pro: true, proPlus: true },
+  {
+    name: "Pro modules",
+    free: false,
+    pro: true,
+    proPlus: true,
+  },
+  {
+    name: "Hand-picked OSS projects",
+    free: false,
+    pro: true,
+    proPlus: true,
+  },
+  {
+    name: "Session recordings",
+    free: false,
+    pro: true,
+    proPlus: true,
+  },
+  { name: "Private thread", free: false, pro: true, proPlus: true },
+  {
+    name: "Updates on open source, jobs, tech",
+    free: false,
+    pro: true,
+    proPlus: true,
+  },
+  { name: "Daily stand-ups", free: false, pro: true, proPlus: true },
+  { name: "Pro References", free: false, pro: true, proPlus: true },
+  {
+    name: "First principles mega-module (20+ modules)",
+    upcoming: true,
+    free: false,
+    pro: false,
+    proPlus: true,
+  },
+  {
+    name: "Build in public mega-module (20+ modules)",
+    upcoming: true,
+    free: false,
+    pro: false,
+    proPlus: true,
   },
 ];
 
-type WhySubItem = { kind: "text"; content: string } | { kind: "pro_slots" };
-
-const whySub: WhySubItem[] = [
-  {
-    kind: "text",
-    content:
-      "Currently, Opensox 2.0 is in progress (70% done) so till the launch, we are offering Pro plan at a discounted price - $49 for the whole year",
-  },
-  { kind: "pro_slots" },
-  {
-    kind: "text",
-    content:
-      "After the launch, this $49 offer be removed and Opensox Pro will be around ~ $89 for whole year.",
-  },
-  {
-    kind: "text",
-    content: "The price of the dollar is constantly increasing.",
-  },
-];
-
-const freePlanCard = {
-  whatYouGetImmediately: [
-    "Free filters to search projects (tech stack, competition, activity, etc)",
-    "Access to the general community",
-  ],
-  whatYouGetAfterLaunch: [
-    "Everything mentioned above",
-    "30 days opensox challenge sheet",
-  ],
-};
-
-const premiumPlanCard = {
-  whatYouGetImmediately: [
-    "Everything in free plan +",
-    "1:1 session on finding remote jobs and internships in open-source companies.",
-    "Quick doubts resolution.",
-    "Personalized guidance for GSoC, LFX, Outreachy, etc",
-    "Access to Pro Discord where you can ask anything anytime.",
-    "Support to enhance skills for open source",
-    "GSOC proposal, resume reviews, etc.",
-    "Upcoming Pro features",
-  ],
-  whatYouGetAfterLaunch: [
-    "Everything mentioned above",
-    "Advanced tool with Pro filters to find open source projects",
-    "30 days opensox challenge sheet",
-    "Upcoming Pro features.",
-  ],
-};
+interface PlanTier {
+  key: TierKey;
+  name: string;
+  price: string;
+  originalPrice?: string;
+  period: string;
+  planId?: string;
+  paymentDescription?: string;
+}
 
 const Pricing = () => {
   const pathname = usePathname();
   const callbackUrl = `${pathname}#pro-price-card`;
-  const premiumPlanId = process.env.NEXT_PUBLIC_YEARLY_PREMIUM_PLAN_ID;
-  const planIdOk =
-    typeof premiumPlanId === "string" && premiumPlanId.length > 0;
 
-  const { data: proMemberCountData } = trpc.payment.getProMemberCount.useQuery(
-    { planId: premiumPlanId ?? "" },
-    { enabled: planIdOk },
-  );
+  const yearlyPlanId = process.env.NEXT_PUBLIC_YEARLY_PREMIUM_PLAN_ID;
+  const fourYearPlanId = process.env.NEXT_PUBLIC_4YEAR_PREMIUM_PLAN_ID;
+
+  // NOTE: `price` below is a display label only. The actual amount charged and
+  // the "≈ ₹…" line both come from the plan record (Plan.price) via
+  // getPublicPlan, so the record is the single source of truth. When changing a
+  // headline price here, update the matching Plan record's price (and keep the
+  // USD label consistent with it) — otherwise the card will advertise one price
+  // and charge another.
+  const tiers: PlanTier[] = [
+    {
+      key: "free",
+      name: "Free",
+      price: "$0",
+      period: "forever",
+    },
+    {
+      key: "pro1",
+      name: "Pro",
+      price: "$49",
+      originalPrice: "$89",
+      period: "/ year",
+      planId: yearlyPlanId,
+      paymentDescription: "Annual Subscription",
+    },
+    {
+      key: "pro4",
+      name: "Pro+",
+      price: "$99",
+      originalPrice: "$199",
+      period: "/ 4 years",
+      planId: fourYearPlanId,
+      paymentDescription: "4 Year Subscription",
+    },
+  ];
 
   useEffect(() => {
     const handleHashScroll = () => {
@@ -158,238 +196,113 @@ const Pricing = () => {
 
   return (
     <>
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-          /* critical css for LCP element - inline for fastest rendering */
-          /* font-family matches Tailwind's font-mono class exactly to ensure consistent fallbacks */
-          .lcp-feature-item { display: flex; flex-direction: column; gap: 1rem; width: 100%; flex: 1; }
-          .lcp-feature-content { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; }
-          .lcp-feature-header { display: flex; gap: 1rem; align-items: center; }
-          .lcp-feature-number { font-size: 3.75rem; font-family: var(--font-dm-mono), Menlo, Monaco, "Courier New", monospace; font-weight: 600; background: linear-gradient(to bottom, #a472ea, #341e7b); -webkit-background-clip: text; background-clip: text; color: transparent; }
-          .lcp-feature-title { font-size: 1.5rem; font-weight: 500; }
-          .lcp-feature-description { font-weight: 500; }
-        `,
-        }}
-      />
-      <main className="w-full  overflow-hidden flex flex-col items-center justify-center relative">
-        <Header title="We are working on Opensox 2.0" />
-        <div className="flex flex-col bg-[#151515]/20 relative w-full ">
-          <div className="h-full  pv relative">
-            <div className=" py-8 border-b border-[#252525]">
-              <h2 className="text-center text-3xl tracking-tight font-medium">
-                What is Opensox 2.0?
-              </h2>
-            </div>
-            <div className=" w-full h-full flex flex-col gap-6  border-b border-[#252525]">
-              <ul className="flex flex-col lg:flex-row [&>li]:w-full  [&>li]:p-6 divide-y lg:divide-y-0 lg:divide-x divide-[#252525] h-full ">
-                {opensoxFeatures.map((feature, index) => {
-                  // render first item (LCP element) immediately without animation
-                  const isLCPElement = index === 0;
-
-                  if (isLCPElement) {
-                    return (
-                      <li key={index} className="lcp-feature-item">
-                        <div className="lcp-feature-content">
-                          <div className="lcp-feature-header">
-                            <div className="lcp-feature-number">
-                              {index + 1}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <h3 className="lcp-feature-title">
-                                {feature.title}
-                              </h3>
-                            </div>
-                          </div>
-                          {Array.isArray(feature.description) ? (
-                            <div className="font-medium">
-                              {feature.description.map(
-                                (sentence, sentenceIndex) => (
-                                  <p key={sentenceIndex} className="mb-2">
-                                    {sentence}
-                                  </p>
-                                ),
-                              )}
-                            </div>
-                          ) : (
-                            <p className="lcp-feature-description">
-                              {feature.description}
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex flex-col gap-2 w-full h-full">
-                          <ul className="flex flex-col gap-3 w-full h-full pb-8">
-                            {feature.features.map((feature, featureIndex) => {
-                              return (
-                                <li
-                                  key={featureIndex}
-                                  className="text-sm flex items-center gap-4"
-                                >
-                                  <CornerDownRight className="size-4 flex-shrink-0 text-[#a472ea]" />
-                                  {feature}
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        </div>
-                      </li>
-                    );
-                  }
-
-                  return (
-                    <motion.li
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        duration: 0.3,
-                        ease: "easeOut",
-                        delay: 0.2 + (index - 1) * 0.05,
-                      }}
-                      key={index}
-                      className="flex flex-col gap-4 w-full flex-1"
-                    >
-                      <div className="flex flex-col gap-2 w-full">
-                        <div className="flex gap-4 items-center">
-                          <div className="text-6xl font-mono font-semibold text-transparent bg-clip-text bg-gradient-to-b from-[#a472ea] to-[#341e7b]">
-                            {index + 1}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="text-2xl font-medium">
-                              {feature.title}
-                            </h3>
-                          </div>
-                        </div>
-                        {Array.isArray(feature.description) ? (
-                          <div className="font-medium">
-                            {feature.description.map(
-                              (sentence, sentenceIndex) => (
-                                <p key={sentenceIndex} className="mb-2">
-                                  {sentence}
-                                </p>
-                              ),
-                            )}
-                          </div>
-                        ) : (
-                          <p className="font-medium">{feature.description}</p>
-                        )}
-                      </div>
-                      <div className="flex flex-col gap-2 w-full h-full">
-                        <ul className="flex flex-col gap-3 w-full h-full pb-8">
-                          {feature.features.map((feature, featureIndex) => {
-                            return (
-                              <li
-                                key={featureIndex}
-                                className="font- text-sm flex items-center gap-4"
-                              >
-                                <CornerDownRight className="size-4 flex-shrink-0 text-[#a472ea]" />
-                                {feature}
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      </div>
-                    </motion.li>
-                  );
-                })}
-              </ul>
-            </div>
+      <main className="w-full overflow-hidden flex flex-col items-center justify-center relative">
+        {/* SECTION 1 - hero */}
+        <section className="relative flex w-full items-center overflow-hidden border-b border-border lg:min-h-screen">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-1/2 lg:h-2/5"
+            style={{
+              maskImage: "linear-gradient(to top, black 0%, transparent 85%)",
+              WebkitMaskImage:
+                "linear-gradient(to top, black 0%, transparent 85%)",
+              filter: "blur(10px)",
+            }}
+          >
+            <Image
+              src="/assets/card_bg.svg"
+              alt=""
+              fill
+              loading="lazy"
+              className="h-full w-full object-cover object-bottom opacity-50"
+            />
           </div>
-          <div className="h-full  relative ">
-            <div className="py-8 border-b border-[#252525]">
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 0.3,
-                  ease: "easeOut",
-                  delay: 0.15,
-                }}
-                className="text-center text-3xl tracking-tight font-medium"
-              >
-                Why should you subscribe to Opensox Pro now?
-              </motion.h2>
-            </div>
-            <div className="w-full border-b border-[#252525]">
-              <div className="w-full max-w-2xl mx-auto border-b lg:border-b-0 lg:border-x border-[#252525] p-6 font-medium space-y-2 ">
-                {whySub.map((sub, index) => {
-                  return (
-                    <motion.p
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        duration: 0.3,
-                        ease: "easeOut",
-                        delay: 0.2 + index * 0.05,
-                      }}
-                      key={index}
-                      className="flex items-center gap-4"
-                    >
-                      <Target className="size-5 flex-shrink-0 text-[#a472ea]" />
-                      {sub.kind === "pro_slots" ? (
-                        planIdOk ? (
-                          <span className="min-w-0">
-                            This offer is only available for the first 200 (
-                            {proMemberCountData !== undefined ? (
-                              <span className="text-success-text">
-                                {proMemberCountData.count} slots booked
-                              </span>
-                            ) : (
-                              <span className="text-text-muted">…</span>
-                            )}
-                            ) users
-                          </span>
-                        ) : (
-                          <span className="min-w-0">
-                            This offer is only available for the first 200 users
-                          </span>
-                        )
-                      ) : (
-                        sub.content
-                      )}
-                    </motion.p>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-          <div className="relative border-b border-[#252525] lg:pb-10">
-            <div className="flex flex-col gap-5 lg:gap-10 py-4 bg-[#151515]/20 backdrop-blur-xl h-full relative w-full overflow-hidden  px-4 lg:px-10">
-              <div className="absolute inset-0 -top-72">
+          <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-10 px-4 py-12 lg:grid-cols-2 lg:gap-12 lg:px-8 lg:py-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="flex flex-col gap-6"
+            >
+              <h1 className="text-5xl font-semibold tracking-tight sm:text-6xl lg:text-7xl">
+                Opensox{" "}
+                <span className="bg-gradient-to-b from-[#a472ea] to-[#432ba0] bg-clip-text text-transparent">
+                  Pro.
+                </span>
+              </h1>
+              <p className="text-2xl font-medium tracking-tight text-text-secondary sm:text-3xl">
+                a small and effective ecosystem for{" "}
+                <a
+                  href="/blog/scale-is-the-problem"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline decoration-brand-purple-light decoration-1 underline-offset-4 transition-colors hover:decoration-brand-purple"
+                >
+                  limited
+                </a>{" "}
+                people.
+              </p>
+              <p className="text-lg font-medium tracking-tight sm:text-xl">
+                learning <span className="text-[#a472ea]">Open Source.</span>{" "}
+                <span className="text-[#a472ea]">Build in Public.</span>{" "}
+                <span className="text-[#a472ea]">First Principles.</span>
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
+              className="flex flex-col items-center gap-4"
+            >
+              <div className="relative aspect-square w-full max-w-sm overflow-hidden rounded-3xl border border-border">
                 <Image
-                  src="/assets/layer1.svg"
-                  alt="background"
+                  src="/assets/jackedaj.jpg"
+                  alt="jackedAJ"
                   fill
-                  loading="lazy"
-                  className=" w-full h-full  -z-10 opacity-90"
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 384px"
+                  className="object-cover object-top"
                 />
               </div>
-              <div className="flex flex-col lg:flex-row items-stretch justify-center gap-6">
-                <PricingCard />
-                <SecondaryPricingCard callbackUrl={callbackUrl} />
-              </div>
-            </div>
+              <p className="text-center text-sm font-medium text-text-secondary">
+                directly managed by jackedAJ (no TAs.)
+              </p>
+            </motion.div>
           </div>
-          <Features />
-          <TestimonialsSection />
-          <div className="border-b border-border text-center py-8 px-4">
-            <p className="text-lg mb-4 text-text-secondary">
-              <Link
-                href="/testimonials"
-                className="text-brand-purple-light hover:text-brand-purple transition-colors underline"
-              >
-                See what our Pro customers said about us.
-              </Link>
-            </p>
+        </section>
+
+        {/* SECTION 2 - pricing comparison */}
+        <section id="pro-price-card" className="w-full border-b border-border">
+          <div className="mx-auto w-full max-w-7xl px-4 py-14 lg:px-8 lg:py-20">
+            <PricingComparison tiers={tiers} callbackUrl={callbackUrl} />
           </div>
-          <div className=" border-b border-[#252525] text-center py-4 font-bold px-4">
-            For any doubts or queries, feel free to ping us at{" "}
+        </section>
+
+        <Features />
+
+        {/* SECTION 3 - testimonials */}
+        <TestimonialsSection />
+        <div className="w-full border-b border-border text-center py-8 px-4">
+          <p className="text-lg mb-4 text-text-secondary">
             <Link
-              href="mailto:opensoxlabs@gmail.com"
-              className="hover:underline bg-gradient-to-b from-[#a472ea] via-[#a472ea]/80 to-[#432ba0] bg-clip-text text-transparent"
+              href="/testimonials"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand-purple-light hover:text-brand-purple transition-colors underline"
             >
-              opensoxlabs@gmail.com
+              see more
             </Link>
-          </div>
+          </p>
+        </div>
+        <div className="w-full border-b border-border text-center py-4 font-bold px-4">
+          For any doubts or queries, feel free to ping us at{" "}
+          <Link
+            href="mailto:opensoxlabs@gmail.com"
+            className="hover:underline bg-gradient-to-b from-[#a472ea] via-[#a472ea]/80 to-[#432ba0] bg-clip-text text-transparent"
+          >
+            opensoxlabs@gmail.com
+          </Link>
         </div>
       </main>
       <Footer />
@@ -399,237 +312,301 @@ const Pricing = () => {
 
 export default Pricing;
 
-const PricingCard = () => {
-  return (
-    <div className="py-2">
-      <div className=" border-border-primary w-full mx-auto flex h-full">
-        <div className="border-dashed border-border-primary w-full lg:w-max mx-auto relative h-full">
-          <div className="w-full h-full lg:w-[500px] relative overflow-hidden mx-auto py-10 pb-14 flex flex-col rounded-3xl">
-            <Image
-              src="/assets/card_bg.svg"
-              alt="background"
-              fill
-              loading="lazy"
-              className="object-cover object-bottom w-full h-full absolute -z-10"
-            />
-            <div className="w-full border-dashed border-border-primary px-6 lg:px-10 pb-4">
-              <div className="w-12 h-12 relative">
-                <Image
-                  src="/assets/logo_var2.svg"
-                  alt="background"
-                  fill
-                  loading="lazy"
-                  className="object-cover size-full"
-                />
-              </div>
-            </div>
-            <ShineBorder shineColor={["#7150E7", "#C89BFF", "#432BA0"]} />
+const FEATURE_LABEL_WIDTH = "w-[9.5rem] shrink-0";
 
-            <div className="w-full border-dashed border-border-primary px-6 lg:px-10  py-4">
-              <h2 className="text-6xl lg:text-[90px] lg:leading-[82px] tracking-tight font-semibold">
-                Free
-              </h2>
-            </div>
-            <div className="w-full border-dashed border-border-primary px-6 lg:px-10 py-4 ">
-              <div className="">
-                <Link href="/dashboard/home" className="cursor-pointer z-30">
-                  <PrimaryButton classname="w-full">
-                    <Terminal />
-                    Get Started
-                  </PrimaryButton>
-                </Link>
-              </div>
-            </div>
-            <div className="w-full border-dashed border-border-primary px-6 lg:px-10 py-4 flex flex-col gap-4 flex-1">
-              <h2 className="text-lg lg:text-xl tracking-tight text-left font-bold">
-                What you get immediately:
-              </h2>
-              <div className="space-y-3 [&>p]:flex [&>p]:items-center [&>p]:gap-2 [&>p]:font-medium">
-                {freePlanCard.whatYouGetImmediately.map((item, index) => {
-                  return (
-                    <p key={index}>
-                      <Check className="w-5 flex-shrink-0" strokeWidth={4} />{" "}
-                      {item}
-                    </p>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="w-full border-dashed border-border-primary px-6 lg:px-10 py-4 flex flex-col gap-4 h-[244px]">
-              <h2 className="text-lg lg:text-xl tracking-tight text-left font-bold">
-                What you get after the launch:
-              </h2>
-              <div className="space-y-3 [&>p]:flex [&>p]:items-center [&>p]:gap-2 [&>p]:font-medium">
-                {freePlanCard.whatYouGetAfterLaunch.map((item, index) => {
-                  return (
-                    <p key={index}>
-                      <Check className="w-5 flex-shrink-0" strokeWidth={4} />{" "}
-                      {item}
-                    </p>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="bg-white mix-blend-plus-lighter absolute h-[120px] w-full blur-[60px] right-0 -bottom-20 opacity-80"></div>
-          </div>
+const FEATURE_ROW_LAYOUT =
+  "flex items-start gap-4 border-b border-border py-3.5 lg:grid lg:grid-cols-[minmax(0,max-content)_1fr] lg:items-center lg:gap-6";
+
+const MOBILE_TABLE_SCROLL =
+  "-mx-4 overflow-x-auto overscroll-x-contain px-4 lg:mx-0 lg:overflow-visible lg:px-0";
+
+const PLAN_COLUMNS_GAP = "gap-6 lg:gap-10";
+
+const PlanColumns = ({
+  children,
+  className = "",
+  align = "end",
+  role,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  align?: "start" | "end";
+  role?: string;
+}) => (
+  <div
+    role={role}
+    className={`flex shrink-0 ${align === "start" ? "ml-0 justify-start pl-0 pr-0" : "ml-auto justify-end pl-8 pr-4 lg:pl-0 lg:pr-6"} ${PLAN_COLUMNS_GAP} ${className}`}
+  >
+    {children}
+  </div>
+);
+
+const PlanColumn = ({
+  children,
+  className = "",
+  role,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  role?: string;
+}) => (
+  <div
+    role={role}
+    className={`flex shrink-0 flex-col items-center px-3 sm:px-4 w-[8rem] sm:w-[10rem] ${className}`}
+  >
+    {children}
+  </div>
+);
+
+const UpcomingBadge = () => (
+  <span className="inline-flex shrink-0 items-center rounded-md border border-success-border/40 bg-success-bg px-2 py-0.5 text-[10px] font-semibold text-success-text">
+    Upcoming
+  </span>
+);
+
+const FeatureCell = ({ value }: { value: FeatureValue }) => {
+  if (value === true) {
+    return (
+      <Check
+        className="h-5 w-5 text-brand-purple-light"
+        strokeWidth={2.75}
+        aria-label="Included"
+      />
+    );
+  }
+
+  if (value === false) {
+    return (
+      <X
+        className="h-5 w-5 text-destructive"
+        strokeWidth={2.75}
+        aria-label="Not included"
+      />
+    );
+  }
+
+  return <span className="text-center text-sm text-text-primary">{value}</span>;
+};
+
+const PRICING_PLAN_BUTTON_CLASS =
+  "w-full !py-2.5 !text-sm !font-semibold";
+
+const PlanColumnHeader = ({
+  tier,
+  callbackUrl,
+}: {
+  tier: PlanTier;
+  callbackUrl: string;
+}) => {
+  const router = useRouter();
+  const planIdOk = typeof tier.planId === "string" && tier.planId.length > 0;
+  const isPaid = tier.key !== "free";
+
+  const { data: publicPlan } = trpc.payment.getPublicPlan.useQuery(
+    { planId: tier.planId as string },
+    {
+      enabled: isPaid && planIdOk,
+      staleTime: 5 * 60 * 1000,
+    },
+  );
+
+  return (
+    <div className="flex h-full w-full flex-col justify-between text-center">
+      <div className="flex flex-col items-center">
+        <p
+          className={`px-3 py-1.5 text-lg font-medium tracking-wide ${isPaid ? "text-brand-purple-light" : "text-text-muted"}`}
+        >
+          {tier.name}
+        </p>
+        <div className="flex flex-col items-center gap-0.5">
+          {isPaid ? (
+            <p className="flex flex-wrap items-baseline justify-center gap-x-1.5 text-2xl font-semibold tracking-tight text-text-primary sm:text-3xl">
+              <span>{tier.price}</span>
+              <span className="text-sm font-normal text-text-muted">
+                {tier.period}
+              </span>
+            </p>
+          ) : (
+            <p className="text-2xl font-semibold tracking-tight text-text-primary sm:text-3xl">
+              {tier.price}
+            </p>
+          )}
+          {tier.originalPrice ? (
+            <span className="text-sm font-normal text-text-muted line-through">
+              {tier.originalPrice}
+            </span>
+          ) : (
+            <span className="text-sm invisible select-none" aria-hidden>
+              &nbsp;
+            </span>
+          )}
+          {isPaid && planIdOk ? (
+            publicPlan ? (
+              <span className="text-sm font-semibold text-text-primary">
+                {formatApproxPlanPrice(publicPlan.price, publicPlan.currency)}
+              </span>
+            ) : (
+              <span className="text-sm invisible select-none" aria-hidden>
+                &nbsp;
+              </span>
+            )
+          ) : null}
         </div>
+      </div>
+      <div className="w-full pt-4">
+        {!isPaid ? (
+          <PrimaryButton
+            classname={PRICING_PLAN_BUTTON_CLASS}
+            onClick={() => router.push("/dashboard/home")}
+          >
+            Start free
+          </PrimaryButton>
+        ) : (
+          <PaymentFlow
+            planId={planIdOk ? (tier.planId as string) : ""}
+            planName={`Opensox ${tier.name}`}
+            description={tier.paymentDescription}
+            buttonText={planIdOk ? "Invest" : "Unavailable"}
+            buttonClassName={`${PRICING_PLAN_BUTTON_CLASS} ${planIdOk ? "" : "!opacity-60 !cursor-not-allowed"}`}
+            callbackUrl={callbackUrl}
+            buttonLocation="pricing_page"
+          />
+        )}
       </div>
     </div>
   );
 };
 
-const SecondaryPricingCard = ({ callbackUrl }: { callbackUrl: string }) => {
-  const premiumPlanId = process.env.NEXT_PUBLIC_YEARLY_PREMIUM_PLAN_ID;
-  const planIdOk =
-    typeof premiumPlanId === "string" && premiumPlanId.length > 0;
-
-  const { data: publicPlan } = trpc.payment.getPublicPlan.useQuery(
-    { planId: premiumPlanId ?? "" },
-    { enabled: planIdOk },
-  );
-
-  const { data: proMemberCountData } = trpc.payment.getProMemberCount.useQuery(
-    { planId: premiumPlanId ?? "" },
-    { enabled: planIdOk },
-  );
+const PricingComparison = ({
+  tiers,
+  callbackUrl,
+}: {
+  tiers: PlanTier[];
+  callbackUrl: string;
+}) => {
+  const freeTier = tiers.find((t) => t.key === "free")!;
+  const proTier = tiers.find((t) => t.key === "pro1")!;
+  const proPlusTier = tiers.find((t) => t.key === "pro4")!;
 
   return (
-    <div className="py-2">
-      <div className=" border-border-primary w-full mx-auto flex h-full">
-        <div className="border-dashed border-border-primary w-full lg:w-max mx-auto relative h-full">
-          <div className=" w-full lg:w-[500px] relative overflow-hidden mx-auto py-10 pb-14 flex flex-col h-full rounded-3xl">
-            <Image
-              src="/assets/card_bg.svg"
-              alt="background"
-              fill
-              loading="lazy"
-              className="object-cover object-bottom w-full h-full absolute -z-10"
-            />
-            <div className="w-full border-dashed border-border-primary px-6 lg:px-10 pb-4 flex items-start justify-between gap-3">
-              <div className="w-12 h-12 relative flex-shrink-0">
-                <Image
-                  src="/assets/logo_var2.svg"
-                  alt="background"
-                  fill
-                  loading="lazy"
-                  className="object-cover size-full"
-                />
-              </div>
-              {planIdOk ? (
-                <div
-                  className="flex items-center justify-end gap-2 min-w-0 pt-0.5 text-right"
-                  role="status"
-                  aria-live="polite"
-                  aria-label={
-                    proMemberCountData !== undefined
-                      ? `${proMemberCountData.count} shareholders invested`
-                      : "loading shareholder count"
-                  }
-                >
-                  {proMemberCountData !== undefined ? (
-                    <>
-                      <span
-                        className="relative flex h-6 w-6 flex-shrink-0 items-center justify-center"
-                        aria-hidden
-                      >
-                        <span className="absolute size-[18px] rounded-full border border-success-text/50" />
-                        <span className="absolute size-[12px] rounded-full border border-success-text/65" />
-                        <span className="relative z-10 size-2 rounded-full bg-success-text animate-pulse" />
-                      </span>
-                      <p className="text-xs sm:text-sm text-success-text font-medium leading-snug">
-                        <span className="tabular-nums">
-                          {proMemberCountData.count}
-                        </span>{" "}
-                        shareholders invested
-                      </p>
-                    </>
-                  ) : (
-                    <span className="text-xs text-text-muted">…</span>
-                  )}
-                </div>
-              ) : null}
-            </div>
-            <ShineBorder shineColor={["#7150E7", "#C89BFF", "#432BA0"]} />
+    <div className="flex flex-col gap-6 lg:gap-14">
+      <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_1fr] lg:items-stretch lg:gap-6">
+        <div className="flex flex-col gap-3 pt-4">
+          <h2 className="text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl lg:text-5xl">
+            Choose your{" "}
+            <span className="bg-gradient-to-b from-brand-purple-light to-brand-purple-dark bg-clip-text text-transparent">
+              plan.
+            </span>
+          </h2>
+          <p className="max-w-sm text-sm text-text-muted">
+            Go Pro or Pro+ to join the ecosystem.
+          </p>
+        </div>
 
-            <div
-              id="pro-price-card"
-              className="w-full border-dashed border-border-primary px-6 lg:px-10  py-4"
-            >
-              <div className="flex items-center gap-4 flex-wrap">
-                <h2 className="text-6xl lg:text-[90px] lg:leading-[82px] tracking-tight font-semibold">
-                  $49{" "}
-                  <span className="text-3xl lg:text-4xl text-white-400 line-through decoration-2">
-                    $89
-                  </span>{" "}
-                  <span className="text-4xl">/ year</span>
-                </h2>
-              </div>
-              <div className="flex items-center gap-3 mt-3 flex-wrap">
-                {publicPlan ? (
-                  <p className="text-lg text-white-400">
-                    {formatApproxPlanPrice(
-                      publicPlan.price,
-                      publicPlan.currency,
-                    )}
-                  </p>
-                ) : null}
-              </div>
+        <PlanColumns className="h-full items-stretch">
+          <PlanColumn className="h-full">
+            <PlanColumnHeader tier={freeTier} callbackUrl={callbackUrl} />
+          </PlanColumn>
+          <PlanColumn className="h-full">
+            <PlanColumnHeader tier={proTier} callbackUrl={callbackUrl} />
+          </PlanColumn>
+          <PlanColumn className="h-full">
+            <PlanColumnHeader tier={proPlusTier} callbackUrl={callbackUrl} />
+          </PlanColumn>
+        </PlanColumns>
+      </div>
+
+      <div className="flex flex-col gap-3 pt-4 lg:hidden">
+        <h2 className="text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
+          Choose your{" "}
+          <span className="bg-gradient-to-b from-brand-purple-light to-brand-purple-dark bg-clip-text text-transparent">
+            plan.
+          </span>
+        </h2>
+        <p className="max-w-sm text-sm text-text-muted">
+          Go Pro or Pro+ to join the ecosystem.
+        </p>
+      </div>
+
+      <div className={MOBILE_TABLE_SCROLL}>
+        <div className="min-w-[40rem] lg:min-w-0">
+          <div className="flex items-stretch pb-6 lg:hidden">
+            <div className={FEATURE_LABEL_WIDTH} aria-hidden />
+            <PlanColumns align="start" className="items-stretch">
+              <PlanColumn className="h-full">
+                <PlanColumnHeader tier={freeTier} callbackUrl={callbackUrl} />
+              </PlanColumn>
+              <PlanColumn className="h-full">
+                <PlanColumnHeader tier={proTier} callbackUrl={callbackUrl} />
+              </PlanColumn>
+              <PlanColumn className="h-full">
+                <PlanColumnHeader
+                  tier={proPlusTier}
+                  callbackUrl={callbackUrl}
+                />
+              </PlanColumn>
+            </PlanColumns>
+          </div>
+
+          <div
+            className="border-t border-border"
+            role="table"
+            aria-label="Plan feature comparison"
+          >
+            <div role="row" className="sr-only">
+              <span role="columnheader">Feature</span>
+              <span role="columnheader">{freeTier.name}</span>
+              <span role="columnheader">{proTier.name}</span>
+              <span role="columnheader">{proPlusTier.name}</span>
             </div>
-            <div className="w-full border-dashed border-border-primary px-6 lg:px-10 py-4 ">
-              <PaymentFlow
-                planId={planIdOk ? premiumPlanId : ""}
-                planName="Opensox Pro"
-                description="Annual Subscription"
-                buttonText={planIdOk ? "Invest" : "Unavailable"}
-                buttonClassName={`w-full max-w-[500px] mx-auto font-semibold ${
-                  planIdOk ? "" : "opacity-60 cursor-not-allowed"
-                }`}
-                callbackUrl={callbackUrl}
-                buttonLocation="pricing_page"
-              />
-              <div className="flex flex-col items-center gap-2 mt-3">
-                <Link
-                  href="/pitch"
-                  className="text-sm text-text-tertiary hover:text-brand-purple-light transition-colors lowercase"
+            {comparisonFeatures.map((feature) => (
+              <div key={feature.name} className={FEATURE_ROW_LAYOUT} role="row">
+                <p
+                  role="rowheader"
+                  className={`${FEATURE_LABEL_WIDTH} flex min-w-0 flex-wrap items-center gap-2 pr-2 text-sm text-text-primary lg:w-auto lg:pr-6`}
                 >
-                  still not sure? read my pitch to you.
-                </Link>
+                  <span>{feature.name}</span>
+                  {feature.upcoming ? <UpcomingBadge /> : null}
+                </p>
+                <PlanColumns
+                  align="start"
+                  role="presentation"
+                  className="items-start lg:ml-auto lg:justify-end lg:pr-6 lg:items-center"
+                >
+                  <PlanColumn
+                    role="cell"
+                    className="items-start lg:items-center"
+                  >
+                    <FeatureCell value={feature.free} />
+                  </PlanColumn>
+                  <PlanColumn
+                    role="cell"
+                    className="items-start lg:items-center"
+                  >
+                    <FeatureCell value={feature.pro} />
+                  </PlanColumn>
+                  <PlanColumn
+                    role="cell"
+                    className="items-start lg:items-center"
+                  >
+                    <FeatureCell value={feature.proPlus} />
+                  </PlanColumn>
+                </PlanColumns>
               </div>
-            </div>
-            <div className="w-full border-dashed border-border-primary px-6 lg:px-10 py-4 flex flex-col gap-4 flex-1">
-              <h2 className="text-lg lg:text-xl tracking-tight text-left font-bold">
-                What you get immediately:
-              </h2>
-              <div className="space-y-3 [&>p]:flex [&>p]:items-center [&>p]:gap-2 [&>p]:font-medium">
-                {premiumPlanCard.whatYouGetImmediately.map((item, index) => {
-                  return (
-                    <p key={index}>
-                      <Check className="w-5 flex-shrink-0" strokeWidth={4} />{" "}
-                      {item}
-                    </p>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="w-full border-dashed border-border-primary px-6 lg:px-10 py-4 flex flex-col gap-4">
-              <h2 className="text-lg lg:text-xl tracking-tight text-left font-bold">
-                What you get after the launch:
-              </h2>
-              <div className="space-y-3 [&>p]:flex [&>p]:items-center [&>p]:gap-2 [&>p]:font-medium">
-                {premiumPlanCard.whatYouGetAfterLaunch.map((item, index) => {
-                  return (
-                    <p key={index} className="flex items-center gap-2">
-                      <Check className="w-5 flex-shrink-0" strokeWidth={4} />{" "}
-                      <span>{item}</span>
-                    </p>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="bg-white mix-blend-plus-lighter absolute h-[120px] w-full blur-[60px] right-0 -bottom-20 opacity-80"></div>
+            ))}
           </div>
         </div>
       </div>
+
+      <p className="text-sm text-text-muted">
+        Still not sure?{" "}
+        <Link
+          href="/pitch"
+          className="text-link hover:text-link-hover underline underline-offset-2 transition-colors"
+        >
+          Read my pitch to you.
+        </Link>
+      </p>
     </div>
   );
 };
@@ -746,8 +723,8 @@ const TestimonialsSection = () => {
   return (
     <div className=" text-white " id="testimonials">
       <Header title="What our Pro customers say about us" />
-      <div className="border-b  border-[#252525] w-full min-h-[80dvh] grid grid-cols-1 lg:grid-cols-7">
-        <div className="lg:col-span-2 flex flex-col font-medium divide-y divide-[#252525]">
+      <div className="border-b  border-border w-full min-h-[80dvh] grid grid-cols-1 lg:grid-cols-7">
+        <div className="lg:col-span-2 flex flex-col font-medium divide-y divide-border">
           {groupedTestimonials[1].map((testimonial) => (
             <div
               key={testimonial.id}
@@ -763,7 +740,7 @@ const TestimonialsSection = () => {
           ))}
         </div>
 
-        <div className="h-full border-y lg:border-x lg:border-y-0 border-[#252525] p-6 lg:p-10 mx-auto flex flex-col gap-6 flex-shrink-0 lg:col-span-3 font-medium">
+        <div className="h-full border-y lg:border-x lg:border-y-0 border-border p-6 lg:p-10 mx-auto flex flex-col gap-6 flex-shrink-0 lg:col-span-3 font-medium">
           {groupedTestimonials[2].map((testimonial) => (
             <div key={testimonial.id} className="flex flex-col gap-6">
               <PremiumTestimonialCard username={testimonial.username} />
@@ -776,7 +753,7 @@ const TestimonialsSection = () => {
           ))}
         </div>
 
-        <div className="lg:col-span-2 flex flex-col font-medium divide-y divide-[#252525]">
+        <div className="lg:col-span-2 flex flex-col font-medium divide-y divide-border">
           {groupedTestimonials[3].map((testimonial) => (
             <div
               key={testimonial.id}
