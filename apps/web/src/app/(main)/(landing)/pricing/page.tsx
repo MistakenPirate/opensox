@@ -312,12 +312,15 @@ const PlanColumns = ({
   children,
   className = "",
   align = "end",
+  role,
 }: {
   children: React.ReactNode;
   className?: string;
   align?: "start" | "end";
+  role?: string;
 }) => (
   <div
+    role={role}
     className={`flex shrink-0 ${align === "start" ? "ml-0 justify-start pl-0 pr-0" : "ml-auto justify-end pl-8 pr-4 lg:pl-12 lg:pr-6"} ${PLAN_COLUMNS_GAP} ${className}`}
   >
     {children}
@@ -327,11 +330,14 @@ const PlanColumns = ({
 const PlanColumn = ({
   children,
   className = "",
+  role,
 }: {
   children: React.ReactNode;
   className?: string;
+  role?: string;
 }) => (
   <div
+    role={role}
     className={`flex shrink-0 flex-col items-center px-3 sm:px-4 w-[8rem] sm:w-[10rem] ${className}`}
   >
     {children}
@@ -352,7 +358,7 @@ const FeatureCell = ({ value }: { value: FeatureValue }) => {
   if (value === false) {
     return (
       <X
-        className="h-3.5 w-3.5 text-text-muted"
+        className="h-3.5 w-3.5 text-destructive"
         strokeWidth={2}
         aria-label="Not included"
       />
@@ -434,7 +440,7 @@ const PlanColumnHeader = ({
         ) : (
           <PaymentFlow
             planId={planIdOk ? (tier.planId as string) : ""}
-            planName="Opensox Pro"
+            planName={`Opensox ${tier.name}`}
             description={tier.paymentDescription}
             buttonText={planIdOk ? "Invest" : "Unavailable"}
             buttonClassName={`${PRICING_BUTTON_CLASS} ${planIdOk ? "" : "!opacity-60 !cursor-not-allowed"}`}
@@ -518,25 +524,46 @@ const PricingComparison = ({
             </PlanColumns>
           </div>
 
-          <div className="border-t border-border">
+          <div
+            className="border-t border-border"
+            role="table"
+            aria-label="Plan feature comparison"
+          >
+            <div role="row" className="sr-only">
+              <span role="columnheader">Feature</span>
+              <span role="columnheader">{freeTier.name}</span>
+              <span role="columnheader">{proTier.name}</span>
+              <span role="columnheader">{proPlusTier.name}</span>
+            </div>
             {comparisonFeatures.map((feature) => (
-              <div key={feature.name} className={FEATURE_ROW_LAYOUT}>
+              <div key={feature.name} className={FEATURE_ROW_LAYOUT} role="row">
                 <p
+                  role="rowheader"
                   className={`${FEATURE_LABEL_WIDTH} min-w-0 pr-2 text-xs text-text-muted lg:w-auto lg:pr-0`}
                 >
                   {feature.name}
                 </p>
                 <PlanColumns
                   align="start"
+                  role="presentation"
                   className="items-start lg:ml-auto lg:justify-end lg:pl-12 lg:pr-6 lg:items-center"
                 >
-                  <PlanColumn className="items-start lg:items-center">
+                  <PlanColumn
+                    role="cell"
+                    className="items-start lg:items-center"
+                  >
                     <FeatureCell value={feature.free} />
                   </PlanColumn>
-                  <PlanColumn className="items-start lg:items-center">
+                  <PlanColumn
+                    role="cell"
+                    className="items-start lg:items-center"
+                  >
                     <FeatureCell value={feature.pro} />
                   </PlanColumn>
-                  <PlanColumn className="items-start lg:items-center">
+                  <PlanColumn
+                    role="cell"
+                    className="items-start lg:items-center"
+                  >
                     <FeatureCell value={feature.proPlus} />
                   </PlanColumn>
                 </PlanColumns>
