@@ -24,7 +24,7 @@ const ProSessionsPage = (): JSX.Element | null => {
     null
   );
   
-  //Applied debouncing so the we don't call api on every keystroke
+   // applied debouncing so we don't call the api on every keystroke
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(searchInput.trim())
@@ -112,6 +112,7 @@ const ProSessionsPage = (): JSX.Element | null => {
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           placeholder="Search sessions"
+          aria-label="Search sessions"
           className="w-full max-w-md px-4 py-2 rounded-lg border border-border bg-ox-content text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand-purple">
           </input>
         </div>
