@@ -144,6 +144,7 @@ export const sessionService = {
       const sessions = await withRetry(
         () =>
           prisma.weeklySession.findMany({
+            where: where ?? {},
             select: {
               id: true,
               title: true,
