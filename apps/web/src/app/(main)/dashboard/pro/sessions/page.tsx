@@ -11,26 +11,39 @@ import { trpc } from "@/lib/trpc";
 import { SessionCard } from "./_components/SessionCard";
 import { SessionVideoDialog } from "./_components/SessionVideoDialog";
 import type { WeeklySession } from "./_components/session-types";
+import { SessionCardSkeleton } from "./_components/SessionCardSkeleton";
 
 const ProSessionsPage = (): JSX.Element | null => {
   const { isPaidUser, isLoading: subscriptionLoading } = useSubscription();
   const { data: session, status } = useSession();
   const router = useRouter();
 
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [activeSession, setActiveSession] = useState<WeeklySession | null>(
     null
   );
+  
+  //Applied debouncing so the we don't call api on every keystroke
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchInput.trim())
+    }, 300);
+    return () => clearTimeout(timer)
+  }, [searchInput]) 
 
   // fetch sessions from api
   const {
     data: sessions,
     isLoading: sessionsLoading,
+    isFetching: sessionsFetching,
     isError: sessionsError,
     error: sessionsErrorData,
-  } = trpc.sessions.getAll.useQuery(undefined, {
+  } = trpc.sessions.getAll.useQuery({ query: debouncedQuery || undefined }, {
     enabled: !!session?.user && status === "authenticated" && isPaidUser,
     refetchOnWindowFocus: false,
     staleTime: 5 * 60 * 1000,
+    placeholderData: (previousData) => previousData,
   });
 
   useEffect(() => {
@@ -93,8 +106,25 @@ const ProSessionsPage = (): JSX.Element | null => {
           </p>
         </div>
 
+        <div className="mb-6 md:mb-8">
+          <input 
+          type="text"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          placeholder="Search sessions"
+          className="w-full max-w-md px-4 py-2 rounded-lg border border-border bg-ox-content text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand-purple">
+          </input>
+        </div>
+
         {/* Sessions Grid */}
-        {sessions && sessions.length > 0 ? (
+        {sessionsFetching && debouncedQuery ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              {Array.from({ length: sessions?.length || 6 }).map((_, i) => (
+                <SessionCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : 
+        sessions && sessions.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {sessions.map((sessionItem: WeeklySession) => (
               <SessionCard
