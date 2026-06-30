@@ -104,7 +104,8 @@ export const sessionService = {
    */
   async getSessions(
     prisma: ExtendedPrismaClient | PrismaClient,
-    userId: string
+    userId: string,
+    query?: string
   ): Promise<SessionWithTopics[]> {
     const subscription = await withRetry(
       () =>
@@ -125,6 +126,19 @@ export const sessionService = {
         "Active subscription required to access sessions"
       );
     }
+
+    const trimmedQuery = query?.trim();
+    const where: Prisma.WeeklySessionWhereInput | undefined = trimmedQuery? {
+      OR: [
+        { title: { contains: trimmedQuery, mode: "insensitive" } },
+        { description: { contains: trimmedQuery, mode: "insensitive" } },
+        { topics: {
+          some: {
+            topic: { contains: trimmedQuery, mode: "insensitive"}
+          }
+        }}
+      ],
+    }: undefined;
 
     try {
       const sessions = await withRetry(

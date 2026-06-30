@@ -35,11 +35,15 @@ function toTRPCError(error: unknown): never {
 }
 
 export const sessionsRouter = router({
-  getAll: protectedProcedure.query(async ({ ctx }) => {
+  getAll: protectedProcedure
+  .input(z.object({
+    query: z.string().trim().optional()
+  }).optional())
+  .query(async ({ ctx, input }) => {
     const userId = (ctx as ProtectedContext).user.id;
 
     try {
-      return await sessionService.getSessions(ctx.db.prisma, userId);
+      return await sessionService.getSessions(ctx.db.prisma, userId, input?.query);
     } catch (error) {
       toTRPCError(error);
     }
