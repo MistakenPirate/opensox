@@ -124,21 +124,21 @@ export const sessionService = {
     if (!subscription) {
       throw new AuthorizationError(
         "Active subscription required to access sessions"
-      );
+      );  
     }
 
-    const trimmedQuery = query?.trim();
-    const where: Prisma.WeeklySessionWhereInput | undefined = trimmedQuery? {
-      OR: [
-        { title: { contains: trimmedQuery, mode: "insensitive" } },
-        { description: { contains: trimmedQuery, mode: "insensitive" } },
-        { topics: {
-          some: {
-            topic: { contains: trimmedQuery, mode: "insensitive"}
-          }
-        }}
-      ],
-    }: undefined;
+    const tokens = query?.trim().split(/\s+/).filter(Boolean) ?? [];
+    const where: Prisma.WeeklySessionWhereInput | undefined = tokens.length
+     ? {
+      AND: tokens.map((token) => ({
+        OR: [
+          { title: { contains: token, mode: "insensitive" } },
+          { description: { contains: token, mode: "insensitive" } },
+          { topics: { some: { topic: { contains: token, mode: "insensitive" } } } },
+           ],
+         })),
+       }
+      : undefined;
 
     try {
       const sessions = await withRetry(
