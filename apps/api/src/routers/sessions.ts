@@ -20,7 +20,7 @@ const sessionInputSchema = z.object({
   topics: z
     .array(
       z.object({
-        timestamp: z.string().trim().min(1),
+        timestamp: z.string().trim(),
         topic: z.string().trim().min(1),
       })
     )

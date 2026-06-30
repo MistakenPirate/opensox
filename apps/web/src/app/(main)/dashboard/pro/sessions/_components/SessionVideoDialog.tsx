@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { CheckCircle2, X } from "lucide-react";
 
 import { getYoutubeEmbedUrl } from "./youtube";
+import { hasTopicTimestamp } from "@/lib/session-topic-format";
 import type { WeeklySession } from "./session-types";
 
 type SessionVideoDialogProps = {
@@ -119,6 +120,11 @@ export function SessionVideoDialog({
                         <CheckCircle2 className="w-4 h-4 text-brand-purple/70 mt-0.5 flex-shrink-0" />
                         <div className="min-w-0">
                           <p className="text-text-secondary break-words">
+                            {hasTopicTimestamp(topic.timestamp) ? (
+                              <span className="font-mono text-text-muted mr-1.5">
+                                {topic.timestamp}
+                              </span>
+                            ) : null}
                             {topic.topic}
                           </p>
                         </div>

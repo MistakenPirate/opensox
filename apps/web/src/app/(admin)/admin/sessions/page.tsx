@@ -10,7 +10,7 @@ import { trpc } from "@/lib/trpc";
 
 import {
   SessionForm,
-  formatTopicLine,
+  formatTopicsText,
   toDatetimeLocalValue,
   type SessionFormSubmitValues,
   type SessionFormValues,
@@ -43,7 +43,7 @@ function toFormValues(session: AdminSession): SessionFormValues {
     description: session.description ?? "",
     youtubeUrl: session.youtubeUrl,
     sessionDate: toDatetimeLocalValue(session.sessionDate),
-    topics: session.topics.map((t) => formatTopicLine(t.timestamp, t.topic)),
+    topicsText: formatTopicsText(session.topics),
   };
 }
 

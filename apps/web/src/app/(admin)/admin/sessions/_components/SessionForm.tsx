@@ -2,45 +2,30 @@
 
 import { useState } from "react";
 
-import { Plus, Trash2 } from "lucide-react";
+import {
+  parseTopicsText,
+  type SessionTopicInput,
+} from "@/lib/session-topic-format";
 
-export type SessionTopicInput = {
-  timestamp: string;
-  topic: string;
-};
+export type { SessionTopicInput } from "@/lib/session-topic-format";
+export {
+  formatTopicLine,
+  formatTopicsText,
+  hasTopicTimestamp,
+  NO_TOPIC_TIMESTAMP,
+  parseTopicLine,
+  parseTopicsText,
+} from "@/lib/session-topic-format";
 
 export type SessionFormValues = {
   title: string;
   description: string;
   youtubeUrl: string;
   sessionDate: string;
-  topics: string[];
+  topicsText: string;
 };
 
-const TOPIC_LINE_PATTERN =
-  /^(\d{1,2}:\d{2}(?::\d{2})?)\s*[-–—]?\s*(.+)$/;
-
-export function formatTopicLine(timestamp: string, topic: string): string {
-  const trimmedTopic = topic.trim();
-  const trimmedTimestamp = timestamp.trim();
-  if (!trimmedTopic) return "";
-  if (!trimmedTimestamp) return trimmedTopic;
-  return `${trimmedTimestamp} ${trimmedTopic}`;
-}
-
-export function parseTopicLine(line: string): SessionTopicInput | null {
-  const trimmed = line.trim();
-  if (!trimmed) return null;
-
-  const match = trimmed.match(TOPIC_LINE_PATTERN);
-  if (match) {
-    return { timestamp: match[1], topic: match[2].trim() };
-  }
-
-  return { timestamp: "0:00", topic: trimmed };
-}
-
-export type SessionFormSubmitValues = Omit<SessionFormValues, "topics"> & {
+export type SessionFormSubmitValues = Omit<SessionFormValues, "topicsText"> & {
   topics: SessionTopicInput[];
 };
 
@@ -57,7 +42,7 @@ const EMPTY: SessionFormValues = {
   description: "",
   youtubeUrl: "",
   sessionDate: "",
-  topics: [],
+  topicsText: "",
 };
 
 const inputClass =
@@ -79,24 +64,6 @@ export function SessionForm({
     value: SessionFormValues[K]
   ) => setValues((prev) => ({ ...prev, [key]: value }));
 
-  const updateTopic = (index: number, value: string) =>
-    setValues((prev) => ({
-      ...prev,
-      topics: prev.topics.map((topic, i) => (i === index ? value : topic)),
-    }));
-
-  const addTopic = () =>
-    setValues((prev) => ({
-      ...prev,
-      topics: [...prev.topics, ""],
-    }));
-
-  const removeTopic = (index: number) =>
-    setValues((prev) => ({
-      ...prev,
-      topics: prev.topics.filter((_, i) => i !== index),
-    }));
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmitAction({
@@ -104,9 +71,7 @@ export function SessionForm({
       title: values.title.trim(),
       description: values.description.trim(),
       youtubeUrl: values.youtubeUrl.trim(),
-      topics: values.topics
-        .map(parseTopicLine)
-        .filter((t): t is SessionTopicInput => t !== null),
+      topics: parseTopicsText(values.topicsText),
     });
   };
 
@@ -181,42 +146,26 @@ export function SessionForm({
       </div>
 
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="block text-sm text-text-secondary">Topics</label>
-          <button
-            type="button"
-            onClick={addTopic}
-            className="inline-flex items-center gap-1 text-sm text-brand-purple-light hover:text-text-primary transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Add topic
-          </button>
-        </div>
-
-        {values.topics.length === 0 ? (
-          <p className="text-text-muted text-sm">No topics added.</p>
-        ) : (
-          <div className="space-y-2">
-            {values.topics.map((topic, index) => (
-              <div key={index} className="flex gap-2">
-                <input
-                  className={`${inputClass} flex-1`}
-                  value={topic}
-                  onChange={(e) => updateTopic(index, e.target.value)}
-                  placeholder="0:00 Introduction to open source"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeTopic(index)}
-                  aria-label="Remove topic"
-                  className="shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-lg bg-dash-raised hover:bg-dash-hover transition-colors"
-                >
-                  <Trash2 className="w-4 h-4 text-text-secondary" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+        <label
+          htmlFor="session-topics"
+          className="block text-sm text-text-secondary mb-1.5"
+        >
+          Topics
+        </label>
+        <textarea
+          id="session-topics"
+          className={`${inputClass} min-h-[160px] resize-y font-mono`}
+          value={values.topicsText}
+          onChange={(e) => update("topicsText", e.target.value)}
+          placeholder={
+            "0:00 Introduction to open source\n3:15 How to choose the right project\n8:00 Live debugging session"
+          }
+        />
+        <p className="mt-1.5 text-text-muted text-xs">
+          One topic per line. Optional timestamp at the start (e.g.{" "}
+          <span className="font-mono">0:00</span> or{" "}
+          <span className="font-mono">12:30</span>).
+        </p>
       </div>
 
       <div className="flex items-center gap-3 pt-2">
