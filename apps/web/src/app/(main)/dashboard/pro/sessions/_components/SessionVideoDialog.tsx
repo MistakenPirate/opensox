@@ -119,6 +119,11 @@ export function SessionVideoDialog({
                         <CheckCircle2 className="w-4 h-4 text-brand-purple/70 mt-0.5 flex-shrink-0" />
                         <div className="min-w-0">
                           <p className="text-text-secondary break-words">
+                            {topic.timestamp && topic.timestamp !== "0:00" ? (
+                              <span className="font-mono text-text-muted mr-1.5">
+                                {topic.timestamp}
+                              </span>
+                            ) : null}
                             {topic.topic}
                           </p>
                         </div>
