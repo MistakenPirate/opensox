@@ -2,10 +2,20 @@
 
 import { useState } from "react";
 
-export type SessionTopicInput = {
-  timestamp: string;
-  topic: string;
-};
+import {
+  parseTopicsText,
+  type SessionTopicInput,
+} from "@/lib/session-topic-format";
+
+export type { SessionTopicInput } from "@/lib/session-topic-format";
+export {
+  formatTopicLine,
+  formatTopicsText,
+  hasTopicTimestamp,
+  NO_TOPIC_TIMESTAMP,
+  parseTopicLine,
+  parseTopicsText,
+} from "@/lib/session-topic-format";
 
 export type SessionFormValues = {
   title: string;
@@ -14,45 +24,6 @@ export type SessionFormValues = {
   sessionDate: string;
   topicsText: string;
 };
-
-const TOPIC_LINE_PATTERN =
-  /^(\d{1,2}:\d{2}(?::\d{2})?)\s*[-–—]?\s*(.+)$/;
-
-export function formatTopicLine(timestamp: string, topic: string): string {
-  const trimmedTopic = topic.trim();
-  const trimmedTimestamp = timestamp.trim();
-  if (!trimmedTopic) return "";
-  if (!trimmedTimestamp) return trimmedTopic;
-  return `${trimmedTimestamp} ${trimmedTopic}`;
-}
-
-export function parseTopicLine(line: string): SessionTopicInput | null {
-  const trimmed = line.trim();
-  if (!trimmed) return null;
-
-  const match = trimmed.match(TOPIC_LINE_PATTERN);
-  if (match) {
-    return { timestamp: match[1], topic: match[2].trim() };
-  }
-
-  return { timestamp: "0:00", topic: trimmed };
-}
-
-export function formatTopicsText(
-  topics: { timestamp: string; topic: string }[]
-): string {
-  return topics
-    .map((t) => formatTopicLine(t.timestamp, t.topic))
-    .filter(Boolean)
-    .join("\n");
-}
-
-export function parseTopicsText(text: string): SessionTopicInput[] {
-  return text
-    .split("\n")
-    .map(parseTopicLine)
-    .filter((t): t is SessionTopicInput => t !== null);
-}
 
 export type SessionFormSubmitValues = Omit<SessionFormValues, "topicsText"> & {
   topics: SessionTopicInput[];

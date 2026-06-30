@@ -46,7 +46,19 @@ const AdminHomePage = (): JSX.Element => {
   if (status === "loading" || (authenticated && adminCheckLoading)) {
     return (
       <CenteredMessage>
-        <div className="w-8 h-8 border-2 border-brand-purple border-t-transparent rounded-full animate-spin" />
+        <div
+          role="status"
+          aria-label="Checking admin access and loading admin stats"
+          className="flex flex-col items-center gap-3"
+        >
+          <div
+            aria-hidden="true"
+            className="w-8 h-8 border-2 border-brand-purple border-t-transparent rounded-full animate-spin"
+          />
+          <span className="sr-only">
+            Checking admin access and loading admin stats.
+          </span>
+        </div>
       </CenteredMessage>
     );
   }
