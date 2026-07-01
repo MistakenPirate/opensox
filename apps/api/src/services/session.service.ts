@@ -104,7 +104,8 @@ export const sessionService = {
    */
   async getSessions(
     prisma: ExtendedPrismaClient | PrismaClient,
-    userId: string
+    userId: string,
+    query?: string
   ): Promise<SessionWithTopics[]> {
     const subscription = await withRetry(
       () =>
@@ -123,13 +124,27 @@ export const sessionService = {
     if (!subscription) {
       throw new AuthorizationError(
         "Active subscription required to access sessions"
-      );
+      );  
     }
+
+    const tokens = query?.trim().split(/\s+/).filter(Boolean) ?? [];
+    const where: Prisma.WeeklySessionWhereInput | undefined = tokens.length
+     ? {
+      AND: tokens.map((token) => ({
+        OR: [
+          { title: { contains: token, mode: "insensitive" } },
+          { description: { contains: token, mode: "insensitive" } },
+          { topics: { some: { topic: { contains: token, mode: "insensitive" } } } },
+           ],
+         })),
+       }
+      : undefined;
 
     try {
       const sessions = await withRetry(
         () =>
           prisma.weeklySession.findMany({
+            where: where ?? {},
             select: {
               id: true,
               title: true,
