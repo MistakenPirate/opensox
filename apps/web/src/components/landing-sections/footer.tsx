@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Twitter, Email, Discord, Youtube, Github } from "../icons/icons";
+import { Twitter, Email, Discord, Youtube, Github, OnlyFans } from "../icons/icons";
 import Link from "next/link";
 import Image from "next/image";
 import { useAnalytics } from "@/hooks/useAnalytics";
@@ -224,6 +224,16 @@ const Footer = () => {
                   </span>
                   Email
                 </button>
+                <Link
+                  href="/of"
+                  onClick={() => handleSocialClick("/of", "OnlyFans")}
+                  className="text-[#b1b1b1] hover:text-white transition-colors text-xs flex items-center gap-1.5"
+                >
+                  <span className="w-3.5">
+                    <OnlyFans />
+                  </span>
+                  OnlyFans
+                </Link>
               </div>
             </div>
           </div>
