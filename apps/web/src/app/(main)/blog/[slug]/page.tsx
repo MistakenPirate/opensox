@@ -5,8 +5,18 @@ import type { Metadata } from "next";
 import BlogThemeSelector from "../blog-theme";
 import BlogSocials from "../blog-socials";
 
+// Refresh cached posts periodically so CMS edits show up without a rebuild.
+export const revalidate = 60;
+
 export async function generateStaticParams() {
-  return getAllSlugs().map((slug) => ({ slug }));
+  // Pre-render known posts when the API is reachable at build time; otherwise
+  // fall back to on-demand rendering rather than failing the build.
+  try {
+    const slugs = await getAllSlugs();
+    return slugs.map((slug) => ({ slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({
@@ -15,7 +25,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await getPostBySlug(slug);
   if (!post) return {};
 
   return {
@@ -30,7 +40,7 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await getPostBySlug(slug);
   if (!post) notFound();
 
   const date = new Date(post.frontmatter.date).toLocaleDateString("en-US", {
