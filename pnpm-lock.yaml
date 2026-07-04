@@ -44,6 +44,9 @@ importers:
       express-rate-limit:
         specifier: ^7.5.0
         version: 7.5.1(express@4.22.1)
+      gray-matter:
+        specifier: ^4.0.3
+        version: 4.0.3
       helmet:
         specifier: ^7.2.0
         version: 7.2.0
