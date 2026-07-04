@@ -178,6 +178,34 @@ model ProModuleLink {
   @@index([moduleId, order])
 }
 
+enum BlogTag {
+  engineering
+  startup
+  distribution
+  misc
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String
+  author      String
+  tag         BlogTag
+  // Markdown source. Rendered to sanitized HTML in the web app (marked +
+  // sanitize-html), same pipeline the file-based posts used.
+  content     String
+  tweetUrl    String?
+  draft       Boolean  @default(false)
+  // Editorial publish date shown to readers; distinct from createdAt.
+  date        DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([draft, date])
+  @@index([createdAt])
+}
+
 enum RefCategory {
   software
   ai
