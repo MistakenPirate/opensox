@@ -8,6 +8,7 @@ import { sessionsRouter } from "./sessions.js";
 import { testimonialRouter } from "./testimonial.js";
 import { modulesRouter } from "./modules.js";
 import { refsRouter } from "./refs.js";
+import { blogRouter } from "./blog.js";
 import { adminRouter } from "./admin.js";
 import { z } from "zod";
 
@@ -30,6 +31,7 @@ export const appRouter = router({
   testimonial: testimonialRouter,
   modules: modulesRouter,
   refs: refsRouter,
+  blog: blogRouter,
   admin: adminRouter,
 });
 
