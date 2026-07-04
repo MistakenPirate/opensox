@@ -29,10 +29,6 @@ function withExternalLinkTargets(html: string): string {
     const href = attrs.match(/\bhref="([^"]*)"/i)?.[1];
     if (!href) return full;
 
-    const isExternal =
-      /^https?:\/\//i.test(href) || href.startsWith("//");
-    if (!isExternal) return full;
-
     let next = hardenExternalLinkRel(attrs.trim());
     if (!/\btarget\s*=/i.test(next)) {
       next += ' target="_blank"';
