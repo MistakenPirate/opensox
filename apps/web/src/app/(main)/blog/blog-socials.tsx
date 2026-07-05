@@ -41,7 +41,7 @@ const socials = [
 
 export default function BlogSocials() {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-wrap items-center gap-3">
       {socials.map((s) => (
         <Link
           key={s.label}
@@ -54,6 +54,14 @@ export default function BlogSocials() {
           {s.icon}
         </Link>
       ))}
+      <Link
+        href="/pricing#pro-price-card"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-xs font-semibold px-3 py-1.5 rounded-full border hover:border-brand-purple hover:text-brand-purple transition-colors text-brand-purple-light border-brand-purple-light"
+      >
+        opensox pro
+      </Link>
     </div>
   );
 }
