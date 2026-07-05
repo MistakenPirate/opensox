@@ -144,7 +144,8 @@ function BlogPostList({
   onEdit: (post: AdminBlogPost) => void;
 }): JSX.Element {
   const utils = trpc.useUtils();
-  const { data, isLoading } = trpc.blog.adminList.useQuery();
+  const { data, isLoading, isError, error, refetch } =
+    trpc.blog.adminList.useQuery();
   const deletePost = trpc.blog.adminDelete.useMutation({
     onSuccess: () => utils.blog.adminList.invalidate(),
     onError: (error) =>
@@ -155,6 +156,25 @@ function BlogPostList({
 
   if (isLoading) {
     return <p className="text-text-secondary">Loading posts...</p>;
+  }
+
+  // Surface fetch failures before the empty state, so a load error isn't
+  // mistaken for "no posts yet".
+  if (isError) {
+    return (
+      <div className="border border-red-500/20 bg-red-500/10 rounded-xl p-6 text-center">
+        <p className="text-red-400 text-sm">
+          Couldn&apos;t load posts: {error.message}
+        </p>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          className="mt-3 text-brand-purple-light hover:underline text-sm"
+        >
+          Try again
+        </button>
+      </div>
+    );
   }
 
   if (posts.length === 0) {
