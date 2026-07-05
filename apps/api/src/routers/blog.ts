@@ -121,6 +121,20 @@ export const blogRouter = router({
   adminDelete: adminProcedure
     .input(z.object({ id: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
-      return blogService.deletePost(ctx.db.prisma, input.id);
+      try {
+        return await blogService.deletePost(ctx.db.prisma, input.id);
+      } catch (error) {
+        // Deleting an already-gone post (e.g. a double click or stale list)
+        // surfaces as Prisma P2025; report it as NOT_FOUND rather than a 500.
+        if (
+          error &&
+          typeof error === "object" &&
+          "code" in error &&
+          (error as { code?: string }).code === "P2025"
+        ) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Post not found" });
+        }
+        throw error;
+      }
     }),
 });
