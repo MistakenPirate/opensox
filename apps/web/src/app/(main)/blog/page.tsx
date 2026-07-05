@@ -12,7 +12,15 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 export default async function BlogPage() {
-  const posts = await getAllPosts();
+  // Don't take the whole /blog page down if the API is unreachable on a cold
+  // render; fall back to an empty list. (On revalidation Next keeps serving the
+  // last good cache, so this only guards the uncached path.)
+  let posts: Awaited<ReturnType<typeof getAllPosts>> = [];
+  try {
+    posts = await getAllPosts();
+  } catch (error) {
+    console.error("Failed to load blog posts:", error);
+  }
 
   return <BlogList posts={posts} />;
 }
