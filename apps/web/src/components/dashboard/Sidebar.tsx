@@ -22,6 +22,7 @@ import {
   ChevronDownIcon,
   LockClosedIcon,
   AcademicCapIcon,
+  UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import { useShowSidebar } from "@/store/useShowSidebar";
 import { signOut, useSession } from "next-auth/react";
@@ -64,6 +65,11 @@ const FREE_ROUTES: RouteConfig[] = [
 
 // premium features under Opensox Pro
 const PREMIUM_ROUTES: RouteConfig[] = [
+  {
+    path: "/dashboard/pro/community",
+    label: "Pro Community",
+    icon: <UserGroupIcon className="size-5" />,
+  },
   {
     path: "/dashboard/pro/sessions",
     label: "Pro Session",

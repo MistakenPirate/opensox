@@ -486,20 +486,17 @@ app.post("/webhook/razorpay", async (req: Request, res: Response) => {
       }
 
       try {
-        // Create payment record (with idempotency check)
-        const paymentRecord = await paymentService.createPaymentRecord(userId, {
-          razorpayPaymentId,
-          razorpayOrderId,
-          amount,
-          currency,
-        });
-
-        // Create subscription (with idempotency check)
-        await paymentService.createSubscription(
+        await paymentService.fulfillPayment({
           userId,
           planId,
-          paymentRecord.id
-        );
+          paymentData: {
+            razorpayPaymentId,
+            razorpayOrderId,
+            amount,
+            currency,
+          },
+          sendConfirmationEmail: true,
+        });
 
         console.log(
           `✅ Webhook: Payment ${razorpayPaymentId} processed successfully`
