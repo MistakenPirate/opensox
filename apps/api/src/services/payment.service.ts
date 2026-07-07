@@ -7,6 +7,7 @@ import {
   PAYMENT_STATUS,
 } from "../constants/subscription.js";
 import { discordService } from "./discord.service.js";
+import { emailService } from "./email.service.js";
 
 const { prisma } = prismaModule;
 
@@ -97,6 +98,15 @@ interface PaymentData {
   amount: number; // Amount in paise (smallest currency unit)
   currency: string;
 }
+
+interface FulfillPaymentInput {
+  userId: string;
+  planId: string;
+  paymentData: PaymentData;
+  sendConfirmationEmail?: boolean;
+}
+
+const DEFAULT_PREMIUM_EMAIL_NAME = "there";
 
 export const paymentService = {
   /**
@@ -381,5 +391,72 @@ export const paymentService = {
       console.error("Error creating subscription:", error);
       throw new Error("Failed to create subscription");
     }
+  },
+
+  async fulfillPayment(input: FulfillPaymentInput): Promise<{
+    payment: any;
+    subscription: any;
+    emailSent: boolean;
+  }> {
+    const { userId, planId, paymentData, sendConfirmationEmail = true } = input;
+
+    const payment = await this.createPaymentRecord(userId, paymentData);
+    const subscription = await this.createSubscription(userId, planId, payment.id);
+
+    let emailSent = false;
+
+    if (sendConfirmationEmail) {
+      try {
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { email: true, firstName: true },
+        });
+
+        if (user?.email) {
+          const firstName =
+            user.firstName?.trim() || DEFAULT_PREMIUM_EMAIL_NAME;
+
+          await emailService.sendPremiumSubscriptionEmail(
+            user.email,
+            firstName
+          );
+          emailSent = true;
+        } else {
+          console.warn(
+            JSON.stringify({
+              level: "warn",
+              service: "paymentService",
+              event: "premium_email_dispatch_skipped",
+              timestamp: new Date().toISOString(),
+              userId,
+              planId,
+              razorpayPaymentId: paymentData.razorpayPaymentId,
+              razorpayOrderId: paymentData.razorpayOrderId,
+              userFound: Boolean(user),
+              hasEmail: Boolean(user?.email),
+              firstNameFallbackUsed: !Boolean(user?.firstName?.trim()),
+              message:
+                "user not found or missing email for premium confirmation email",
+            })
+          );
+        }
+      } catch (error) {
+        console.error(
+          JSON.stringify({
+            level: "error",
+            service: "paymentService",
+            event: "premium_email_dispatch_failed",
+            timestamp: new Date().toISOString(),
+            userId,
+            planId,
+            razorpayPaymentId: paymentData.razorpayPaymentId,
+            razorpayOrderId: paymentData.razorpayOrderId,
+            errorMessage: error instanceof Error ? error.message : String(error),
+          })
+        );
+      }
+    }
+
+    return { payment, subscription, emailSent };
   },
 };

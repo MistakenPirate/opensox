@@ -2,10 +2,6 @@ import { router, protectedProcedure, publicProcedure } from "../trpc.js";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { paymentService } from "../services/payment.service.js";
-import { emailService } from "../services/email.service.js";
-import prismaModule from "../prisma.js";
-
-const { prisma } = prismaModule;
 
 const ALLOWED_NOTE_KEYS = ["plan"] as const;
 const MAX_NOTE_VALUE_LENGTH = 255;
@@ -199,48 +195,17 @@ export const paymentRouter = router({
             });
           }
 
-          // Step 2: Create payment record (with idempotency check)
-          const payment = await paymentService.createPaymentRecord(userId, {
-            razorpayPaymentId: input.razorpay_payment_id,
-            razorpayOrderId: input.razorpay_order_id,
-            amount: plan.price, // Use price from database
-            currency: plan.currency,
-          });
-
-          // Step 3: Create/activate subscription
-          const subscription = await paymentService.createSubscription(
+          const { payment, subscription } = await paymentService.fulfillPayment({
             userId,
-            input.planId,
-            payment.id
-          );
-
-          // Step 4: Fetch user details and send premium subscription email
-          try {
-            const user = await prisma.user.findUnique({
-              where: { id: userId },
-              select: { email: true, firstName: true },
-            });
-
-            if (user && user.email && user.firstName) {
-              // Send premium subscription confirmation email
-              await emailService.sendPremiumSubscriptionEmail(
-                user.email,
-                user.firstName
-              );
-            } else {
-              // Log warning but don't fail the payment verification
-              console.warn(
-                `Unable to send premium subscription email: User ${userId} not found or missing email/firstName`
-              );
-            }
-          } catch (emailError) {
-            // Log error but don't fail the payment verification
-            // Payment and subscription are already successful
-            console.error(
-              "Error sending premium subscription email:",
-              emailError
-            );
-          }
+            planId: input.planId,
+            paymentData: {
+              razorpayPaymentId: input.razorpay_payment_id,
+              razorpayOrderId: input.razorpay_order_id,
+              amount: plan.price,
+              currency: plan.currency,
+            },
+            sendConfirmationEmail: true,
+          });
 
           return {
             success: true,

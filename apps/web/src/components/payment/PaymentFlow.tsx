@@ -120,7 +120,9 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
           "verification_failed",
           error instanceof Error ? error.message : "Unknown error"
         );
-        alert("Payment verification failed. Please contact support.");
+        alert(
+          "Payment verification is taking longer than expected. No worries! your access will be activated within 2 mins."
+        );
         setIsProcessing(false);
       }
     },
