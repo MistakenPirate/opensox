@@ -10,6 +10,17 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
+const isTemporaryVerificationDelay = (error: unknown): boolean => {
+  if (!(error instanceof TRPCClientError)) {
+    return false;
+  }
+
+  return (
+    error.data?.code === "INTERNAL_SERVER_ERROR" &&
+    error.message === "Failed to verify payment"
+  );
+};
+
 interface PaymentFlowProps {
   planId: string; // Required: Plan ID from database
   planName?: string;
@@ -120,9 +131,13 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
           "verification_failed",
           error instanceof Error ? error.message : "Unknown error"
         );
-        alert(
-          "Payment verification is taking longer than expected. No worries! your access will be activated within 2 mins."
-        );
+        if (isTemporaryVerificationDelay(error)) {
+          alert(
+            "Payment verification is taking longer than expected. No worries! your access will be activated within 2 mins."
+          );
+        } else {
+          alert("Payment verification failed. No worries! We'll reach out or you can ping us at opensoxlabs@gmail.com.");
+        }
         setIsProcessing(false);
       }
     },

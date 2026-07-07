@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useSession } from "next-auth/react";
 import type { Session } from "next-auth";
 import { useSearchParams } from "next/navigation";
 
-export default function ProCommunityPage() {
+function ProCommunityPageContent() {
   const { isPaidUser, isLoading } = useSubscription();
   const { data: session } = useSession();
   const searchParams = useSearchParams();
@@ -186,5 +186,21 @@ export default function ProCommunityPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ProCommunityPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="w-full h-full flex flex-col p-6 bg-ox-content">
+          <div className="flex items-center justify-center h-full">
+            <span className="text-text-muted">Loading...</span>
+          </div>
+        </div>
+      }
+    >
+      <ProCommunityPageContent />
+    </Suspense>
   );
 }

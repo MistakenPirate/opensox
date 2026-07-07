@@ -99,6 +99,16 @@ interface PaymentData {
   currency: string;
 }
 
+interface PaymentRecordResult {
+  payment: any;
+  wasCreated: boolean;
+}
+
+interface SubscriptionResult {
+  subscription: any;
+  wasCreated: boolean;
+}
+
 interface FulfillPaymentInput {
   userId: string;
   planId: string;
@@ -270,7 +280,7 @@ export const paymentService = {
   async createPaymentRecord(
     userId: string,
     paymentData: PaymentData
-  ): Promise<any> {
+  ): Promise<PaymentRecordResult> {
     try {
       // Check if payment already exists (idempotency)
       const existingPayment = await prisma.payment.findUnique({
@@ -278,7 +288,10 @@ export const paymentService = {
       });
 
       if (existingPayment) {
-        return existingPayment;
+        return {
+          payment: existingPayment,
+          wasCreated: false,
+        };
       }
 
       // Create new payment record
@@ -293,7 +306,10 @@ export const paymentService = {
         },
       });
 
-      return payment;
+      return {
+        payment,
+        wasCreated: true,
+      };
     } catch (error) {
       console.error("Error creating payment record:", error);
       throw new Error("Failed to create payment record");
@@ -307,7 +323,7 @@ export const paymentService = {
     userId: string,
     planId: string,
     paymentId: string
-  ): Promise<any> {
+  ): Promise<SubscriptionResult> {
     try {
       // Get plan details
       const plan = await prisma.plan.findUnique({
@@ -350,7 +366,10 @@ export const paymentService = {
       });
 
       if (existingSubscription) {
-        return existingSubscription;
+        return {
+          subscription: existingSubscription,
+          wasCreated: false,
+        };
       }
 
       // Create subscription
@@ -386,7 +405,10 @@ export const paymentService = {
         }
       }
 
-      return subscription;
+      return {
+        subscription,
+        wasCreated: true,
+      };
     } catch (error) {
       console.error("Error creating subscription:", error);
       throw new Error("Failed to create subscription");
@@ -400,12 +422,14 @@ export const paymentService = {
   }> {
     const { userId, planId, paymentData, sendConfirmationEmail = true } = input;
 
-    const payment = await this.createPaymentRecord(userId, paymentData);
-    const subscription = await this.createSubscription(userId, planId, payment.id);
+    const { payment, wasCreated: paymentWasCreated } =
+      await this.createPaymentRecord(userId, paymentData);
+    const { subscription, wasCreated: subscriptionWasCreated } =
+      await this.createSubscription(userId, planId, payment.id);
 
     let emailSent = false;
 
-    if (sendConfirmationEmail) {
+    if (sendConfirmationEmail && (paymentWasCreated || subscriptionWasCreated)) {
       try {
         const user = await prisma.user.findUnique({
           where: { id: userId },
@@ -416,11 +440,10 @@ export const paymentService = {
           const firstName =
             user.firstName?.trim() || DEFAULT_PREMIUM_EMAIL_NAME;
 
-          await emailService.sendPremiumSubscriptionEmail(
+          emailSent = await emailService.sendPremiumSubscriptionEmail(
             user.email,
             firstName
           );
-          emailSent = true;
         } else {
           console.warn(
             JSON.stringify({
