@@ -24,16 +24,23 @@ export const TestimonialPopup = (): JSX.Element | null => {
   const router = useRouter();
   const { trackLinkClick, trackButtonClick } = useAnalytics();
 
-  const { data } = trpc.testimonial.shouldShowPopup.useQuery(undefined, {
-    staleTime: 60 * 60 * 1000,
+  const { data, isLoading } = trpc.testimonial.shouldShowPopup.useQuery(undefined, {
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   // show popup once eligibility is confirmed and cooldown has passed
   useEffect(() => {
-    if (data?.show && !isCooldownActive()) {
-      setDismissed(false);
+    if (!isLoading) {
+      if (data?.show && !isCooldownActive()) {
+        setDismissed(false);
+      } else {
+        setDismissed(true);
+      }
     }
-  }, [data]);
+  }, [data, isLoading]);
 
   const handleDismiss = () => {
     trackButtonClick("Testimonial Popup Dismissed", "dashboard-home");
@@ -72,7 +79,7 @@ export const TestimonialPopup = (): JSX.Element | null => {
                 Enjoying Opensox Pro?
               </h2>
               <p className="text-text-muted text-sm leading-relaxed">
-                {"You've been with Opensox Pro for a while now — would you mind sharing your experience? It helps others find us and takes less than a minute."}
+                {"We hope you've enjoyed using Opensox Pro! If you have a minute, would you mind sharing your experience? Your feedback means a lot to us and helps others find us."}
               </p>
             </div>
   
