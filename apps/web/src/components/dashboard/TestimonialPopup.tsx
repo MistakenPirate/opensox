@@ -170,7 +170,7 @@ export const TestimonialPopup = (): JSX.Element => {
                 id="testimonial-popup-title"
                 className="text-lg font-semibold text-text-primary"
               >
-                hi! sorry for this shit popup?
+                hi! sorry for this annoying pop-up.
               </h2>
               <p
                 id="testimonial-popup-desc"
