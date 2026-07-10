@@ -23,11 +23,12 @@ const Home = () => {
     initializeState();
   }, [setData, setRenderProjects, setProjectTitle]);
 
-  return ( <>
+  return (
+    <>
       <Dashboard />
-      <TestimonialPopup/>
-      </> 
-    ) ;
+      <TestimonialPopup />
+    </>
+  );
 };
 
 export default Home;

@@ -127,30 +127,41 @@ export const testimonialRouter = router({
       return result;
     }),
 
-    // get user's testimonial
-    shouldShowPopup: protectedProcedure.query(async ({ ctx }: any) => {
-      const userId = ctx.user.id;
+  shouldShowPopup: protectedProcedure.query(async ({ ctx }: any) => {
+    const userId = ctx.user.id;
 
-      const { isPaidUser, subscription } = await userService.checkSubscriptionStatus(ctx.db.prisma, userId);
+    const { isPaidUser } = await userService.checkSubscriptionStatus(
+      ctx.db.prisma,
+      userId
+    );
 
-      if(!isPaidUser || !subscription){
-        return {
-          show: false
-        }
-      }
-      const existingTestimonial = await ctx.db.prisma.testimonial.findUnique({
-        where: {
-          userId
-        }
-      })
-      if(existingTestimonial){
-        return {
-          show: false
-        }
-      }
-      const THREE_WEEK_MS = 21 * 24 * 60 * 60 * 1000;
-      const subscriptionAge = Date.now() - subscription.startDate.getTime();
+    if (!isPaidUser) {
+      return { show: false };
+    }
 
-      return { show: subscriptionAge > THREE_WEEK_MS}
-    })
+    const existingTestimonial = await ctx.db.prisma.testimonial.findUnique({
+      where: { userId },
+    });
+
+    if (existingTestimonial) {
+      return { show: false };
+    }
+
+    // use earliest subscription so renewals do not reset the 3-week clock
+    const earliestSubscription = await ctx.db.prisma.subscription.findFirst({
+      where: { userId },
+      orderBy: { startDate: "asc" },
+      select: { startDate: true },
+    });
+
+    if (!earliestSubscription) {
+      return { show: false };
+    }
+
+    const THREE_WEEK_MS = 21 * 24 * 60 * 60 * 1000;
+    const subscriptionAge =
+      Date.now() - earliestSubscription.startDate.getTime();
+
+    return { show: subscriptionAge > THREE_WEEK_MS };
+  }),
 });
