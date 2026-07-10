@@ -97,6 +97,15 @@ export type ProProjectInput = {
   qualities: string;
 };
 
+// Thrown when a reorder payload isn't a clean permutation of the existing
+// projects. Mapped to a 400 by the router.
+export class ReorderValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ReorderValidationError";
+  }
+}
+
 async function assertActiveSubscription(db: Db, userId: string): Promise<void> {
   const subscription = await db.subscription.findFirst({
     where: {
@@ -204,10 +213,29 @@ export const proProjectService = {
     return { id };
   },
 
-  // Persist a full ordering. `ids` is the complete list in the new top-to-bottom
-  // order; each project's `order` becomes its index, densifying to 0..n-1.
+  // Persist a full ordering. `ids` must be the complete set of existing projects,
+  // each exactly once, in the new top-to-bottom order; every project's `order`
+  // becomes its index, densifying to 0..n-1. Reject anything else up front so a
+  // duplicate, partial, or unknown id can't corrupt the ordering mid-transaction.
   async reorderProjects(db: Db, ids: string[]) {
     const client = projectDb(db);
+
+    const unique = new Set(ids);
+    if (unique.size !== ids.length) {
+      throw new ReorderValidationError("Duplicate project ids in reorder request.");
+    }
+
+    const existing = await client.proProject.findMany({});
+    const existingIds = new Set(existing.map((p) => p.id));
+    if (
+      existingIds.size !== unique.size ||
+      ids.some((id) => !existingIds.has(id))
+    ) {
+      throw new ReorderValidationError(
+        "Reorder request must include every project exactly once."
+      );
+    }
+
     await client.$transaction(
       ids.map((id, index) =>
         client.proProject.update({ where: { id }, data: { order: index } })

@@ -48,7 +48,17 @@ const ProjectsCmsPage = (): JSX.Element => {
   if (status === "loading" || (authenticated && adminCheckLoading)) {
     return (
       <CenteredMessage>
-        <div className="w-8 h-8 border-2 border-brand-purple border-t-transparent rounded-full animate-spin" />
+        <div
+          role="status"
+          aria-label="Checking admin access"
+          className="flex flex-col items-center gap-3"
+        >
+          <div
+            aria-hidden="true"
+            className="w-8 h-8 border-2 border-brand-purple border-t-transparent rounded-full animate-spin"
+          />
+          <span className="sr-only">Checking admin access.</span>
+        </div>
       </CenteredMessage>
     );
   }
@@ -175,6 +185,21 @@ function ProjectList({
     reorder.mutate({ ids: items.map((p) => p.id) });
   };
 
+  // Keyboard equivalent of a drag step: move one project up (-1) or down (+1),
+  // marking the list dirty so it commits like a pointer drag does.
+  const moveByKeyboard = (id: string, delta: number) => {
+    setItems((prev) => {
+      const from = prev.findIndex((p) => p.id === id);
+      const to = from + delta;
+      if (from === -1 || to < 0 || to >= prev.length) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      dirtyRef.current = true;
+      return next;
+    });
+  };
+
   if (isError) {
     return (
       <p className="text-text-secondary">
@@ -224,6 +249,7 @@ function ProjectList({
             position={index + 1}
             onEdit={onEdit}
             onCommit={commitOrder}
+            onMove={moveByKeyboard}
             onDelete={(id) => {
               if (window.confirm(`Delete "${project.name}"? This can't be undone.`)) {
                 deleteProject.mutate({ id });
@@ -246,6 +272,7 @@ function ProjectRow({
   onEdit,
   onDelete,
   onCommit,
+  onMove,
   deleting,
 }: {
   project: AdminProject;
@@ -253,9 +280,23 @@ function ProjectRow({
   onEdit: (project: AdminProject) => void;
   onDelete: (id: string) => void;
   onCommit: () => void;
+  onMove: (id: string, delta: number) => void;
   deleting: boolean;
 }): JSX.Element {
   const controls = useDragControls();
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      onMove(project.id, -1);
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      onMove(project.id, 1);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      onCommit();
+    }
+  };
 
   return (
     <Reorder.Item
@@ -269,8 +310,9 @@ function ProjectRow({
         <button
           type="button"
           onPointerDown={(e) => controls.start(e)}
-          aria-label={`Drag to reorder ${project.name}`}
-          className="cursor-grab active:cursor-grabbing touch-none text-text-muted hover:text-text-secondary shrink-0"
+          onKeyDown={handleKeyDown}
+          aria-label={`Reorder ${project.name}. Use arrow up and down to move, Enter to save.`}
+          className="cursor-grab active:cursor-grabbing touch-none text-text-muted hover:text-text-secondary shrink-0 rounded focus-visible:ring-2 focus-visible:ring-brand-purple/50 focus-visible:outline-none"
         >
           <GripVertical className="w-4 h-4" />
         </button>

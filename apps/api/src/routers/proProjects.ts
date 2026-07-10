@@ -7,7 +7,10 @@ import {
   isAdminEmail,
   type ProtectedContext,
 } from "../trpc.js";
-import { proProjectService } from "../services/proProject.service.js";
+import {
+  proProjectService,
+  ReorderValidationError,
+} from "../services/proProject.service.js";
 import { AuthorizationError } from "../services/session.service.js";
 
 const projectUrlSchema = z
@@ -42,6 +45,9 @@ function logProjectMutation(
 function toTRPCError(error: unknown): never {
   if (error instanceof AuthorizationError) {
     throw new TRPCError({ code: "FORBIDDEN", message: error.message });
+  }
+  if (error instanceof ReorderValidationError) {
+    throw new TRPCError({ code: "BAD_REQUEST", message: error.message });
   }
   throw error;
 }
@@ -110,12 +116,16 @@ export const proProjectsRouter = router({
     .mutation(async ({ ctx, input }) => {
       const userId = (ctx as ProtectedContext).user.id;
       logProjectMutation("adminReorder", userId, undefined, "start");
-      const result = await proProjectService.reorderProjects(
-        ctx.db.prisma,
-        input.ids
-      );
-      logProjectMutation("adminReorder", userId, undefined, "success");
-      return result;
+      try {
+        const result = await proProjectService.reorderProjects(
+          ctx.db.prisma,
+          input.ids
+        );
+        logProjectMutation("adminReorder", userId, undefined, "success");
+        return result;
+      } catch (error) {
+        toTRPCError(error);
+      }
     }),
 
   adminDelete: adminProcedure
