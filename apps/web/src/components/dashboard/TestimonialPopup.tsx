@@ -68,12 +68,19 @@ export const TestimonialPopup = (): JSX.Element | null => {
       {!dismissed && (
         <motion.div
           key="testimonial-popup"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="testimonial-popup-title"
+          aria-describedby="testimonial-popup-desc" 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
           className="fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm"
           onClick={handleDismiss}
+          onKeyDown={(e) => {
+                 if (e.key === "Escape") handleDismiss();
+            }}
         >
           <motion.div
             initial={{ opacity: 0, y: 12, scale: 0.95 }}
@@ -85,10 +92,10 @@ export const TestimonialPopup = (): JSX.Element | null => {
           >
             {/* Text */}
             <div className="flex flex-col items-center text-center gap-2">
-              <h2 className="text-text-primary text-base font-semibold">
+            <h2 id="testimonial-popup-title" className="text-text-primary text-base font-semibold">
                 Enjoying Opensox Pro?
               </h2>
-              <p className="text-text-muted text-sm leading-relaxed">
+              <p id="testimonial-popup-desc" className="text-text-muted text-sm leading-relaxed">
                 {"We hope you've enjoyed using Opensox Pro! If you have a minute, would you mind sharing your experience? Your feedback means a lot to us and helps others find us."}
               </p>
             </div>
