@@ -6,6 +6,7 @@ import { useProjectsData } from "@/store/useProjectsDataStore";
 import { useRenderProjects } from "@/store/useRenderProjectsStore";
 import { projectsOfTheWeek } from "@/utils/config";
 import { useEffect } from "react";
+import { TestimonialPopup } from "@/components/dashboard/TestimonialPopup";
 
 const Home = () => {
   const { setRenderProjects } = useRenderProjects();
@@ -22,7 +23,12 @@ const Home = () => {
     initializeState();
   }, [setData, setRenderProjects, setProjectTitle]);
 
-  return <Dashboard />;
+  return (
+    <>
+      <Dashboard />
+      <TestimonialPopup />
+    </>
+  );
 };
 
 export default Home;
