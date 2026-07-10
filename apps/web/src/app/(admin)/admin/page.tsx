@@ -30,6 +30,11 @@ const ADMIN_SECTIONS = [
     title: "Pro references",
     description: "Manage reference links shown to Pro members.",
   },
+  {
+    href: "/admin/projects",
+    title: "Pro projects",
+    description: "Manage open source projects shown to Pro members.",
+  },
 ] as const;
 
 const AdminHomePage = (): JSX.Element => {
