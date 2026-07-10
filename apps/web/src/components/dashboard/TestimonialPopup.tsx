@@ -10,13 +10,18 @@ const DISMISS_KEY = "testimonialPopupDismissedAt";
 const COOLDOWN_DAYS = 5;
 
 function isCooldownActive(): boolean {
-  const dismissedAt = localStorage.getItem(DISMISS_KEY);
-  if (!dismissedAt) return false;
+  try {
+    const dismissedAt = localStorage.getItem(DISMISS_KEY);
+    if (!dismissedAt) return false;
 
-  const daysSinceDismissed =
-    (Date.now() - Number(dismissedAt)) / (1000 * 60 * 60 * 24);
+    const daysSinceDismissed =
+      (Date.now() - Number(dismissedAt)) / (1000 * 60 * 60 * 24);
 
-  return daysSinceDismissed < COOLDOWN_DAYS;
+    return daysSinceDismissed < COOLDOWN_DAYS;
+  }catch(error){
+    console.error("Error checking cooldown", error);
+    return false;
+   }
 }
 
 export const TestimonialPopup = (): JSX.Element | null => {
@@ -44,7 +49,12 @@ export const TestimonialPopup = (): JSX.Element | null => {
 
   const handleDismiss = () => {
     trackButtonClick("Testimonial Popup Dismissed", "dashboard-home");
-    localStorage.setItem(DISMISS_KEY, String(Date.now()));
+    try{
+      localStorage.setItem(DISMISS_KEY, String(Date.now()));
+    }catch(error){
+        console.error("Error dismissing testimonial popup", error);
+    }
+    
     setDismissed(true);
   };
 
