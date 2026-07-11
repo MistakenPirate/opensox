@@ -31,10 +31,10 @@ export default function BlogList({ posts }: { posts: BlogMeta[] }) {
         <header className="mb-12">
           <div className="flex items-center justify-between">
             <Link
-              href="/"
+              href="/dashboard/home"
               className="text-sm blog-link transition-colors"
             >
-              &larr; Home
+              &larr; Dashboard
             </Link>
             <BlogThemeSelector />
           </div>

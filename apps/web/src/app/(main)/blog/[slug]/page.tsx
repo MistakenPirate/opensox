@@ -44,12 +44,20 @@ export default async function BlogPostPage({
     <main className="blog-page min-h-screen">
       <article className="max-w-4xl mx-auto px-6 py-20">
         <div className="flex items-center justify-between">
-          <Link
-            href="/blog"
-            className="text-sm blog-link transition-colors"
-          >
-            &larr; Blog
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/blog"
+              className="text-sm blog-link transition-colors"
+            >
+              &larr; Blog
+            </Link>
+            <Link
+              href="/dashboard/home"
+              className="text-sm blog-link transition-colors"
+            >
+              Dashboard
+            </Link>
+          </div>
           <BlogThemeSelector />
         </div>
 
