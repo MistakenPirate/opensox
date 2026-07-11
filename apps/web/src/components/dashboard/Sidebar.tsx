@@ -23,6 +23,7 @@ import {
   LockClosedIcon,
   AcademicCapIcon,
   UserGroupIcon,
+  NewspaperIcon,
 } from "@heroicons/react/24/outline";
 import { useShowSidebar } from "@/store/useShowSidebar";
 import { signOut, useSession } from "next-auth/react";
@@ -60,6 +61,11 @@ const FREE_ROUTES: RouteConfig[] = [
     path: "/dashboard/oss-programs",
     label: "OSS Programs",
     icon: <AcademicCapIcon className="size-5" />,
+  },
+  {
+    path: "/blog",
+    label: "Blogs",
+    icon: <NewspaperIcon className="size-5" />,
   },
 ];
 
