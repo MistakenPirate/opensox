@@ -113,6 +113,11 @@ const AdminHomePage = (): JSX.Element => {
                   )
                 : "—"}
             </span>
+            <span className="mx-2 text-dash-border">·</span>
+            Latest pro member:{" "}
+            <span className="text-text-secondary">
+              {stats?.latestProMemberEmail ?? "—"}
+            </span>
           </p>
         </div>
 
